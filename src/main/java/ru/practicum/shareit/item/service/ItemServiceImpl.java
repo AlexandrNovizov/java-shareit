@@ -23,9 +23,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(CreateItemDto newItem, Long ownerId) {
-        userRepository.findById(ownerId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", ownerId))
-        );
+        checkUserExists(ownerId);
 
         Item createdItem = itemRepository.create(ItemDtoMapper.mapToItem(newItem, ownerId));
 
@@ -34,12 +32,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto update(UpdateItemDto updateItemDto, Long itemId, Long ownerId) {
-        userRepository.findById(ownerId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", ownerId))
-        );
+        checkUserExists(ownerId);
 
-        ItemDto oldItem = getById(itemId);
-
+        Item oldItem = getItemOrThrowException(itemId);
         if (!oldItem.getOwnerId().equals(ownerId)) {
             throw new AccessDeniedException(
                     String.format(
@@ -48,29 +43,22 @@ public class ItemServiceImpl implements ItemService {
             );
         }
 
-        oldItem.setName(updateItemDto.getName());
-        oldItem.setDescription(updateItemDto.getDescription());
-        oldItem.setAvailable(updateItemDto.getAvailable());
-
-        Item updatedItem = itemRepository.update(ItemDtoMapper.mapToItem(oldItem));
+        setFields(oldItem, updateItemDto);
+        Item updatedItem = itemRepository.update(oldItem);
 
         return ItemDtoMapper.mapToDto(updatedItem);
     }
 
     @Override
     public ItemDto getById(Long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException(String.format("Предмет с id=%d не найден", itemId))
-        );
+        Item item = getItemOrThrowException(itemId);
 
         return ItemDtoMapper.mapToDto(item);
     }
 
     @Override
     public List<ItemDto> getAllByOwnerId(Long ownerId) {
-        userRepository.findById(ownerId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", ownerId))
-        );
+        checkUserExists(ownerId);
 
         return itemRepository.findAllByOwnerId(ownerId).stream()
                 .map(ItemDtoMapper::mapToDto)
@@ -86,5 +74,29 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.search(query.toLowerCase()).stream()
                 .map(ItemDtoMapper::mapToDto)
                 .toList();
+    }
+
+    private Item getItemOrThrowException(Long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет с id=%d не найден", itemId))
+        );
+    }
+
+    private void checkUserExists(Long userId) {
+        userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
+        );
+    }
+
+    private void setFields(Item oldItem, UpdateItemDto updateItem) {
+        if (updateItem.getName() != null && !updateItem.getName().isBlank()) {
+            oldItem.setName(updateItem.getName());
+        }
+        if (updateItem.getDescription() != null && !updateItem.getDescription().isBlank()) {
+            oldItem.setDescription(updateItem.getDescription());
+        }
+        if (updateItem.getAvailable() != null) {
+            oldItem.setAvailable(updateItem.getAvailable());
+        }
     }
 }

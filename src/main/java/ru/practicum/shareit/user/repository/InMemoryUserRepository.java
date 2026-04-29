@@ -1,74 +1,53 @@
 package ru.practicum.shareit.user.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
-@Repository
+@Component
 @RequiredArgsConstructor
 public class InMemoryUserRepository implements UserRepository {
 
-    private final List<User> users;
-    private long nextId = -1;
+    private final Map<Long, User> users = new HashMap<>();
 
     @Override
     public User create(User newUser) {
         newUser.setId(getNextId());
-        users.add(newUser);
+        users.put(newUser.getId(), newUser);
         return newUser;
     }
 
     @Override
     public User update(User userToUpdate) {
-        User oldUser = findById(userToUpdate.getId()).get();
-
-        User updated = setFields(oldUser, userToUpdate);
-
-        return updated;
+        return users.replace(userToUpdate.getId(), userToUpdate);
     }
 
     @Override
     public void delete(Long userId) {
-        findById(userId).ifPresent(users::remove);
+        findById(userId).ifPresent(ignored -> users.remove(userId));
     }
 
     @Override
     public Optional<User> findById(Long userId) {
-        return users.stream()
-                .filter(user -> Objects.equals(user.getId(), userId))
-                .findAny();
+        return Optional.ofNullable(users.get(userId));
     }
 
     @Override
     public boolean isUniqueEmail(String email) {
-        return users.stream()
+        return users.values().stream()
                 .filter(user -> user.getEmail().equals(email))
                 .findAny()
                 .isEmpty();
     }
 
-    private User setFields(User oldUser, User newUser) {
-        if (newUser.getName() != null) {
-            oldUser.setName(newUser.getName());
-        }
-        if (newUser.getEmail() != null) {
-            oldUser.setEmail(newUser.getEmail());
-        }
-        return oldUser;
-    }
-
     private long getNextId() {
-        if (nextId == -1) {
-            nextId = users.stream()
-                    .mapToLong(User::getId)
-                    .max()
-                    .orElse(0L);
-        }
-
-        return ++nextId;
+        long currentMaxId = users.keySet()
+                .stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0);
+        return ++currentMaxId;
     }
 }

@@ -20,9 +20,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(CreateUserDto newUser) {
 
-        if (!userRepository.isUniqueEmail(newUser.getEmail())) {
-            throw new EmailAlreadyExistsException("Пользователь с таким email уже существует");
-        }
+        throwExceptionIfNotUniqueEmail(newUser.getEmail());
 
         User user = userRepository.create(UserDtoMapper.mapToUser(newUser));
 
@@ -32,13 +30,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(UpdateUserDto updateDto, Long userId) {
 
-        UserDto userToUpdate = getById(userId);
-
+        User userToUpdate = getUserOrThrowException(userId);
         throwExceptionIfNotUniqueEmail(updateDto.getEmail());
-        userToUpdate.setEmail(updateDto.getEmail());
-        userToUpdate.setName(updateDto.getName());
+        setFields(userToUpdate, updateDto);
 
-        User receivedUser = userRepository.update(UserDtoMapper.mapToUser(userToUpdate));
+        User receivedUser = userRepository.update(userToUpdate);
 
         return UserDtoMapper.mapToUserDto(receivedUser);
     }
@@ -51,11 +47,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getById(Long id) {
 
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", id))
-        );
+        User user = getUserOrThrowException(id);
 
         return UserDtoMapper.mapToUserDto(user);
+    }
+
+    private void setFields(User oldUser, UpdateUserDto newUser) {
+        if (newUser.getName() != null && !newUser.getName().isBlank()) {
+            oldUser.setName(newUser.getName());
+        }
+        if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) {
+            oldUser.setEmail(newUser.getEmail());
+        }
+    }
+
+    private User getUserOrThrowException(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
+        );
     }
 
     private void throwExceptionIfNotUniqueEmail(String email) {
