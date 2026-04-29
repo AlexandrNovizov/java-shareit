@@ -15,13 +15,13 @@ public class UserDtoMapper {
 
         return user;
     }
-    
+
     public static User mapToUser(CreateUserDto dto) {
         User user = new User();
-        
+
         user.setEmail(dto.getEmail());
         user.setName(dto.getName());
-        
+
         return user;
     }
 
