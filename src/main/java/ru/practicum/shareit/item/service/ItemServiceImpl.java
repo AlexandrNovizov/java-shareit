@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.dto.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
@@ -23,19 +24,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(CreateItemDto newItem, Long ownerId) {
-        checkUserExists(ownerId);
+        User owner = getUserOrThrowException(ownerId);
 
-        Item createdItem = itemRepository.create(ItemDtoMapper.mapToItem(newItem, ownerId));
+        Item createdItem = itemRepository.save(ItemDtoMapper.mapToItem(newItem, owner));
 
         return ItemDtoMapper.mapToDto(createdItem);
     }
 
     @Override
     public ItemDto update(UpdateItemDto updateItemDto, Long itemId, Long ownerId) {
-        checkUserExists(ownerId);
+        getUserOrThrowException(ownerId);
 
         Item oldItem = getItemOrThrowException(itemId);
-        if (!oldItem.getOwnerId().equals(ownerId)) {
+        if (!oldItem.getOwner().getId().equals(ownerId)) {
             throw new AccessDeniedException(
                     String.format(
                             "Пользователь с id=%d не является владельцем вещи с id=%d", ownerId, itemId
@@ -44,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         setFields(oldItem, updateItemDto);
-        Item updatedItem = itemRepository.update(oldItem);
+        Item updatedItem = itemRepository.save(oldItem);
 
         return ItemDtoMapper.mapToDto(updatedItem);
     }
@@ -58,9 +59,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAllByOwnerId(Long ownerId) {
-        checkUserExists(ownerId);
+        getUserOrThrowException(ownerId);
 
-        return itemRepository.findAllByOwnerId(ownerId).stream()
+        return itemRepository.findByOwnerId(ownerId).stream()
                 .map(ItemDtoMapper::mapToDto)
                 .toList();
     }
@@ -71,7 +72,9 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
 
-        return itemRepository.search(query.toLowerCase()).stream()
+        return itemRepository
+                .searchByQuery(query)
+                .stream()
                 .map(ItemDtoMapper::mapToDto)
                 .toList();
     }
@@ -82,8 +85,8 @@ public class ItemServiceImpl implements ItemService {
         );
     }
 
-    private void checkUserExists(Long userId) {
-        userRepository.findById(userId).orElseThrow(
+    private User getUserOrThrowException(Long userId) {
+        return userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
         );
     }
