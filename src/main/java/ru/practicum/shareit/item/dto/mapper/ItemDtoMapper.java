@@ -38,6 +38,7 @@ public class ItemDtoMapper {
         entity.setName(dto.getName());
         entity.setDescription(dto.getDescription());
         entity.setAvailable(dto.getAvailable());
+        entity.setOwner(owner);
 
         return entity;
     }
