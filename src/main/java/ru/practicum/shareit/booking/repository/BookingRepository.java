@@ -2,9 +2,12 @@ package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.projection.LastAndNextBooking;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -105,4 +108,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.status LIKE 'REJECTED'" +
             "ORDER BY b.start ASC")
     List<Booking> getRejectedBookingsByOwnerId(Long ownerId);
+
+    @Query("SELECT NEW ru.practicum.shareit.booking.model.projection.LastAndNextBooking(" +
+            "i.id, " +
+            "MAX(CASE WHEN b.start <= CURRENT_TIMESTAMP THEN b.start ELSE NULL END), " +
+            "MIN(CASE WHEN b.start > CURRENT_TIMESTAMP THEN b.start ELSE NULL END))" +
+            "FROM Booking AS b " +
+            "JOIN b.item AS i " +
+            "WHERE b.status = 'ACCEPTED' AND " +
+            "i.id IN :ids " +
+            "GROUP BY i.id")
+    List<LastAndNextBooking> getLastAndNextBookingForIds(
+            @Param("ids") Collection<Long> ids
+    );
 }

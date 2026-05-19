@@ -2,8 +2,11 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.model.projection.LastAndNextBooking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.BookingInfoItemDto;
 import ru.practicum.shareit.item.dto.CreateItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
@@ -14,6 +17,9 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +27,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public ItemDto create(CreateItemDto newItem, Long ownerId) {
@@ -58,12 +65,26 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllByOwnerId(Long ownerId) {
+    public List<BookingInfoItemDto> getAllByOwnerId(Long ownerId) {
         getUserOrThrowException(ownerId);
 
-        return itemRepository.findByOwnerId(ownerId).stream()
+        List<ItemDto> items = itemRepository.findByOwnerId(ownerId).stream()
                 .map(ItemDtoMapper::mapToDto)
                 .toList();
+
+        if (items.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> ids = items.stream().map(ItemDto::getId).toList();
+
+        List<LastAndNextBooking> bookings = bookingRepository.getLastAndNextBookingForIds(ids);
+
+        Map<Long, LastAndNextBooking> bookingInfo = bookings
+                .stream()
+                .collect(Collectors.toMap(LastAndNextBooking::getId, Function.identity()));
+
+        return ItemDtoMapper.mapToBookingInfoItemDto(items, bookingInfo);
     }
 
     @Override

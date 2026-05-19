@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.BookingInfoItemDto;
 import ru.practicum.shareit.item.dto.CreateItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
@@ -44,7 +45,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public List<BookingInfoItemDto> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
         return itemService.getAllByOwnerId(ownerId);
     }
 
