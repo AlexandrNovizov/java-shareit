@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.dto.mapper;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.model.projection.LastAndNextBooking;
-import ru.practicum.shareit.item.dto.BookingInfoItemDto;
 import ru.practicum.shareit.item.dto.CreateItemDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -49,14 +48,16 @@ public class ItemDtoMapper {
         return entity;
     }
 
-    public static BookingInfoItemDto mapToBookingInfoItemDto(ItemDto item, LastAndNextBooking info) {
-        BookingInfoItemDto dto = new BookingInfoItemDto();
+    public static List<ItemDto> setBookingInfo(
+            Collection<ItemDto> items,
+            Map<Long, LastAndNextBooking> dateTimeInfoMap) {
 
-        dto.setId(item.getId());
-        dto.setName(item.getName());
-        dto.setDescription(item.getDescription());
-        dto.setAvailable(item.getAvailable());
+        return items.stream()
+                .map(item -> setBookingInfo(item, dateTimeInfoMap.get(item.getId())))
+                .toList();
+    }
 
+    public static ItemDto setBookingInfo(ItemDto dto, LastAndNextBooking info) {
         if (info == null) {
             dto.setLastBooking(null);
             dto.setNextBooking(null);
@@ -64,16 +65,6 @@ public class ItemDtoMapper {
             dto.setLastBooking(info.getLast());
             dto.setNextBooking(info.getNext());
         }
-
         return dto;
-    }
-
-    public static List<BookingInfoItemDto> mapToBookingInfoItemDto(
-            Collection<ItemDto> items,
-            Map<Long, LastAndNextBooking> dateTimeInfoMap) {
-
-        return items.stream()
-                .map(item -> mapToBookingInfoItemDto(item, dateTimeInfoMap.get(item.getId())))
-                .toList();
     }
 }

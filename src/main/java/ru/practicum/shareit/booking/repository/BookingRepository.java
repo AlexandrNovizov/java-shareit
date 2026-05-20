@@ -19,6 +19,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.start ASC")
     List<Booking> getAllBookingsByBookerId(Long bookerId);
 
+    @Query("SELECT COUNT(*) > 0 FROM Booking AS b " +
+            "JOIN b.booker " +
+            "WHERE b.item.id = ?1 " +
+            "AND b.booker.id = ?2 " +
+            "AND b.status = 'APPROVED' " +
+            "AND b.`end` < CURRENT_TIMESTAMP")
+    Boolean hasItemBookedByUser(Long itemId, Long userId);
+
     @Query("SELECT b FROM Booking AS b " +
             "JOIN FETCH b.booker " +
             "WHERE b.booker.id = ?1 " +
