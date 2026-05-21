@@ -42,13 +42,7 @@ public class BookingServiceImpl implements BookingService {
             throw new UnavailableItemException(String.format("Предмет с id=%d недоступен", item.getId()));
         }
 
-        if (dto.getStart().equals(dto.getEnd())) {
-            throw new ConditionsNotMetException("Время начала бронирования не может быть равна времени конца");
-        }
-
-        if (dto.getStart().isAfter(dto.getEnd())) {
-            throw new ConditionsNotMetException("Время начала бронирования должно быть до времени конца");
-        }
+        validateBooking(dto);
 
         Booking bookingToCreate = BookingDtoMapper.mapToBooking(dto, booker, item);
 
@@ -123,6 +117,16 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream()
                 .map(BookingDtoMapper::mapToBookingDto)
                 .toList();
+    }
+
+    private static void validateBooking(CreateBookingDto dto) {
+        if (dto.getStart().equals(dto.getEnd())) {
+            throw new ConditionsNotMetException("Время начала бронирования не может быть равна времени конца");
+        }
+
+        if (dto.getStart().isAfter(dto.getEnd())) {
+            throw new ConditionsNotMetException("Время начала бронирования должно быть до времени конца");
+        }
     }
 
     private List<Booking> getAllBookingsByUserIdAndState(Long userId, BookingState state) {

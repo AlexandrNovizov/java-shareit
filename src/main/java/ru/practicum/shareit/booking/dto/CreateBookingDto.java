@@ -12,11 +12,8 @@ public class CreateBookingDto {
     private Long itemId;
 
     @NotNull
-    // Для прохода тестов
-    // @FutureOrPresent(message = "Дата начала бронирования не может быть в прошлом")
     private LocalDateTime start;
 
     @NotNull
-    //@Future(message = "Дата окончания бронирования должна быть в будущем")
     private LocalDateTime end;
 }

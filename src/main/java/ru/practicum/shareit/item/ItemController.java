@@ -58,7 +58,7 @@ public class ItemController {
     @ResponseStatus(HttpStatus.CREATED)
     public CommentDto addComment(
             @PathVariable Long itemId,
-            @RequestBody CreateCommentDto createDto,
+            @RequestBody @Validated CreateCommentDto createDto,
             @RequestHeader("X-Sharer-User-Id") Long ownerId) {
 
         return itemService.addComment(createDto, itemId, ownerId);
