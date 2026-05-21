@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EmailAlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -13,6 +14,7 @@ import ru.practicum.shareit.user.model.User;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -22,7 +24,7 @@ public class UserServiceImpl implements UserService {
 
         throwExceptionIfNotUniqueEmail(newUser.getEmail());
 
-        User user = userRepository.create(UserDtoMapper.mapToUser(newUser));
+        User user = userRepository.save(UserDtoMapper.mapToUser(newUser));
 
         return UserDtoMapper.mapToUserDto(user);
     }
@@ -34,14 +36,14 @@ public class UserServiceImpl implements UserService {
         throwExceptionIfNotUniqueEmail(updateDto.getEmail());
         setFields(userToUpdate, updateDto);
 
-        User receivedUser = userRepository.update(userToUpdate);
+        User receivedUser = userRepository.save(userToUpdate);
 
         return UserDtoMapper.mapToUserDto(receivedUser);
     }
 
     @Override
     public void delete(Long id) {
-        userRepository.delete(id);
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -68,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void throwExceptionIfNotUniqueEmail(String email) {
-        if (!userRepository.isUniqueEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException("Пользователь с таким email уже существует");
         }
     }
