@@ -1,0 +1,60 @@
+package ru.practicum.shareit.request.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.request.dto.CreateItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestWithItemsDto;
+import ru.practicum.shareit.request.dto.mapper.ItemRequestDtoMapper;
+import ru.practicum.shareit.request.dto.mapper.ItemRequestWithItemsDtoMapper;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ItemRequestServiceImpl implements ItemRequestService {
+
+    private final ItemRequestRepository itemRequestRepository;
+    private final UserRepository userRepository;
+
+    @Override
+    public ItemRequestDto create(Long userId, CreateItemRequestDto dto) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
+        );
+
+        ItemRequest newRequest = ItemRequestDtoMapper.mapToEntity(dto, user);
+
+        ItemRequest savedRequest = itemRequestRepository.save(newRequest);
+
+        return ItemRequestDtoMapper.mapToDto(savedRequest);
+    }
+
+    @Override
+    public List<ItemRequestWithItemsDto> getAllByOwnerId(Long ownerId) {
+        userRepository.findById(ownerId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", ownerId))
+        );
+
+        List<ItemRequest> userRequests = itemRequestRepository.findAllByUserIdOrderByCreatedDesc(ownerId);
+
+        return userRequests.stream()
+                .map(ItemRequestWithItemsDtoMapper::mapToDto)
+                .toList();
+    }
+
+    @Override
+    public List<ItemRequestDto> getAll() {
+        return List.of();
+    }
+
+    @Override
+    public ItemRequestDto getById(Long requestId) {
+        return null;
+    }
+}
