@@ -9,6 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestWithItemsDto;
@@ -22,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -40,6 +43,9 @@ class ItemRequestServiceImplTest {
     @Mock
     private ItemRequestRepository itemRequestRepository;
 
+    @Mock
+    private ItemRepository itemRepository;
+
     @InjectMocks
     private ItemRequestServiceImpl itemRequestService;
 
@@ -55,7 +61,7 @@ class ItemRequestServiceImplTest {
                 expectedDesc,
                 testUser,
                 LocalDateTime.now(),
-                new ArrayList<>()
+                List.of()
         );
 
         when(userRepository.findById(anyLong()))
@@ -83,7 +89,7 @@ class ItemRequestServiceImplTest {
                 expectedDesc,
                 testUser,
                 LocalDateTime.now(),
-                new ArrayList<>()
+                List.of()
         );
 
         when(userRepository.findById(anyLong()))
@@ -194,7 +200,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void shouldThrowNotFoundExceptionIfRequestNotFound() {
+    void getByIdShouldThrowNotFoundExceptionIfRequestNotFound() {
 
         long requestId = 1L;
 
@@ -207,5 +213,44 @@ class ItemRequestServiceImplTest {
                 () -> itemRequestService.getById(requestId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    void shouldAddItemToRequest() {
+        long requestId = 1;
+        long itemId = 1;
+        Item existingItem = new Item(
+                2L,
+                "ex",
+                "e",
+                true,
+                testUser
+        );
+        List<Item> items = new ArrayList<>();
+        items.add(existingItem);
+
+        ItemRequest request = new ItemRequest(requestId, "test user 1", testUser, LocalDateTime.now(), items);
+        Item item = new Item(
+                itemId,
+                "testName",
+                "test desc",
+                true,
+                testUser
+        );
+
+        when(itemRequestRepository.findById(anyLong()))
+                .thenAnswer(ignored -> Optional.of(request));
+
+        when(itemRepository.findById(anyLong()))
+                .thenAnswer(ignored -> Optional.of(item));
+
+        ItemRequestWithItemsDto requestDto = itemRequestService.addItem(requestId, itemId);
+
+        assertThat(requestDto.getItems(), hasSize(2));
+        assertThat(requestDto.getItems(), allOf(
+                hasItem(hasProperty("itemId", equalTo(item.getId()))),
+                hasItem(hasProperty("itemId", equalTo(existingItem.getId())))
+        ));
+
     }
 }

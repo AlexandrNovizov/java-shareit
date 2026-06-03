@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -197,7 +198,7 @@ public class ItemRequestServiceIntegrationTest {
                 hasProperty("description", equalTo(request.getDescription())),
                 hasProperty("created", equalTo(request.getCreated())),
                 hasProperty("userId", equalTo(request.getUser().getId())),
-                hasProperty("items", equalTo(request.getItems()))
+                hasProperty("items", empty())
         ));
     }
 
@@ -259,7 +260,6 @@ public class ItemRequestServiceIntegrationTest {
         List<ItemRequestDto> allRequests = itemRequestService.getAll();
 
         assertThat(allRequests, hasSize(3));
-        // TODO: проверка на сортировку по времени создания
 
         List<LocalDateTime> actualOrder = allRequests.stream()
                 .map(ItemRequestDto::getCreated)

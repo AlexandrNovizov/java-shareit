@@ -11,7 +11,7 @@ public class RequestItemInfoDto {
     private Long itemId;
 
     @NotBlank
-    private String description;
+    private String name;
 
     @NotNull
     private Long ownerId;

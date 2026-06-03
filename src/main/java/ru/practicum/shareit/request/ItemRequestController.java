@@ -39,4 +39,11 @@ public class ItemRequestController {
     public ItemRequestWithItemsDto getById(@PathVariable Long requestId) {
         return itemRequestService.getById(requestId);
     }
+
+    @PatchMapping("/{requestId}/add/{itemId}")
+    public ItemRequestWithItemsDto addItemToRequest(@PathVariable Long requestId,
+                                                    @PathVariable Long itemId) {
+
+        return itemRequestService.addItem(requestId, itemId);
+    }
 }

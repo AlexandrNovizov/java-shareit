@@ -7,6 +7,7 @@ import ru.practicum.shareit.request.dto.RequestItemInfoDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
+import java.util.Set;
 
 @UtilityClass
 public class ItemRequestWithItemsDtoMapper {
@@ -34,7 +35,7 @@ public class ItemRequestWithItemsDtoMapper {
         RequestItemInfoDto dto = new RequestItemInfoDto();
 
         dto.setItemId(entity.getId());
-        dto.setDescription(entity.getDescription());
+        dto.setName(entity.getName());
         dto.setOwnerId(entity.getOwner().getId());
 
         return dto;

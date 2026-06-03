@@ -15,12 +15,12 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,6 +31,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
@@ -38,7 +39,23 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(CreateItemDto newItem, Long ownerId) {
         User owner = getUserOrThrowException(ownerId);
 
+        ItemRequest request = null;
+        if (newItem.getRequestId() != null) {
+            Long requestId = newItem.getRequestId();
+            request = itemRequestRepository.findById(requestId).orElseThrow(
+                    () -> new NotFoundException(String.format("Запрос с id=%d не найден", requestId))
+            );
+        }
+
         Item createdItem = itemRepository.save(ItemDtoMapper.mapToItem(newItem, owner));
+
+        if (request != null) {
+
+            if (!request.getItems().contains(createdItem)) {
+                request.getItems().add(createdItem);
+                itemRequestRepository.save(request);
+            }
+        }
 
         return ItemDtoMapper.mapToDto(createdItem);
     }
