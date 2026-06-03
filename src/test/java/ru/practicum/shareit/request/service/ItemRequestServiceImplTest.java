@@ -21,10 +21,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -61,7 +58,7 @@ class ItemRequestServiceImplTest {
                 expectedDesc,
                 testUser,
                 LocalDateTime.now(),
-                List.of()
+                Set.of()
         );
 
         when(userRepository.findById(anyLong()))
@@ -89,7 +86,7 @@ class ItemRequestServiceImplTest {
                 expectedDesc,
                 testUser,
                 LocalDateTime.now(),
-                List.of()
+                Set.of()
         );
 
         when(userRepository.findById(anyLong()))
@@ -113,12 +110,12 @@ class ItemRequestServiceImplTest {
         User otherUser = new User(2L, "other@mail.ru", "otherName");
 
         List<ItemRequest> testUserRequests = List.of(
-                new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), List.of()),
-                new ItemRequest(2L, "test user 2", testUser, LocalDateTime.now(), List.of())
+                new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), Set.of()),
+                new ItemRequest(2L, "test user 2", testUser, LocalDateTime.now(), Set.of())
         );
 
         List<ItemRequest> otherUserRequests = List.of(
-                new ItemRequest(3L, "other user 1", otherUser, LocalDateTime.now(), List.of())
+                new ItemRequest(3L, "other user 1", otherUser, LocalDateTime.now(), Set.of())
         );
 
         List<ItemRequestWithItemsDto> expectedList = testUserRequests.stream()
@@ -161,9 +158,9 @@ class ItemRequestServiceImplTest {
     @Test
     void shouldReturnAllRequests() {
         List<ItemRequest> requests = List.of(
-                new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), List.of()),
-                new ItemRequest(2L, "test user 2", testUser, LocalDateTime.now(), List.of()),
-                new ItemRequest(3L, "other user 1", testUser, LocalDateTime.now(), List.of())
+                new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), Set.of()),
+                new ItemRequest(2L, "test user 2", testUser, LocalDateTime.now(), Set.of()),
+                new ItemRequest(3L, "other user 1", testUser, LocalDateTime.now(), Set.of())
         );
 
         List<ItemRequestDto> expecetedList = List.of(
@@ -183,7 +180,7 @@ class ItemRequestServiceImplTest {
 
     @Test
     void shouldReturnRequestWithGivenId() {
-        ItemRequest request = new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), List.of());
+        ItemRequest request = new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), Set.of());
 
         when(itemRequestRepository.findById(anyLong()))
                 .thenAnswer(ignored -> Optional.of(request));
@@ -226,7 +223,7 @@ class ItemRequestServiceImplTest {
                 true,
                 testUser
         );
-        List<Item> items = new ArrayList<>();
+        Set<Item> items = new HashSet<>();
         items.add(existingItem);
 
         ItemRequest request = new ItemRequest(requestId, "test user 1", testUser, LocalDateTime.now(), items);

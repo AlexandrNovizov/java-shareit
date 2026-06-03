@@ -87,12 +87,12 @@ public class ItemRequestServiceIntegrationTest {
         User otherUser = new User(null, "other@mail.ru", "otherName");
 
         List<ItemRequest> testUserRequests = List.of(
-                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(1), List.of()),
-                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), List.of())
+                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(1), Set.of()),
+                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), Set.of())
         );
 
         List<ItemRequest> otherUserRequests = List.of(
-                new ItemRequest(null, "other user 1", otherUser, LocalDateTime.now(), List.of())
+                new ItemRequest(null, "other user 1", otherUser, LocalDateTime.now(), Set.of())
         );
 
         user = userRepository.save(user);
@@ -133,8 +133,8 @@ public class ItemRequestServiceIntegrationTest {
     void shouldReturnRequestsOfUserOrderedByCreationDesc() {
 
         List<ItemRequest> testUserRequests = List.of(
-                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(10), List.of()),
-                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), List.of())
+                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(10), Set.of()),
+                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), Set.of())
         );
 
         user = userRepository.save(user);
@@ -186,7 +186,7 @@ public class ItemRequestServiceIntegrationTest {
                 "test desc",
                 user,
                 LocalDateTime.now(),
-                List.of()
+                Set.of()
         );
 
         request = itemRequestRepository.save(request);
@@ -218,12 +218,12 @@ public class ItemRequestServiceIntegrationTest {
         User otherUser = new User(null, "other@mail.ru", "otherName");
 
         List<ItemRequest> testUserRequests = List.of(
-                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(1), List.of()),
-                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), List.of())
+                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(1), Set.of()),
+                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), Set.of())
         );
 
         List<ItemRequest> otherUserRequests = List.of(
-                new ItemRequest(null, "other user 1", otherUser, LocalDateTime.now(), List.of())
+                new ItemRequest(null, "other user 1", otherUser, LocalDateTime.now(), Set.of())
         );
 
         userRepository.save(user);
@@ -246,9 +246,9 @@ public class ItemRequestServiceIntegrationTest {
     void shouldReturnAllRequestsOrderedByCreationDesc() {
 
         List<ItemRequest> testUserRequests = List.of(
-                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(1), List.of()),
-                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), List.of()),
-                new ItemRequest(null, "test user 3", user, LocalDateTime.now(), List.of())
+                new ItemRequest(null, "test user 1", user, LocalDateTime.now().minusSeconds(1), Set.of()),
+                new ItemRequest(null, "test user 2", user, LocalDateTime.now().minusSeconds(5), Set.of()),
+                new ItemRequest(null, "test user 3", user, LocalDateTime.now(), Set.of())
         );
 
         userRepository.save(user);

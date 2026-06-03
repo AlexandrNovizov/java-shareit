@@ -39,5 +39,5 @@ public class ItemRequest {
             joinColumns = @JoinColumn(name = "request_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "item_id", referencedColumnName = "id")
     )
-    private List<Item> items = new ArrayList<>();
+    private Set<Item> items = new HashSet<>();
 }

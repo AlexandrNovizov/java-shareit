@@ -25,7 +25,7 @@ public class ItemRequestWithItemsDtoMapper {
         return dto;
     }
 
-    public static List<RequestItemInfoDto> mapToDto(List<Item> entities) {
+    public static List<RequestItemInfoDto> mapToDto(Set<Item> entities) {
         return entities.stream()
                 .map(ItemRequestWithItemsDtoMapper::mapToDto)
                 .toList();
