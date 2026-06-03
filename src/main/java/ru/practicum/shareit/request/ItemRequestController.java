@@ -29,4 +29,14 @@ public class ItemRequestController {
 
         return itemRequestService.getAllByOwnerId(ownerId);
     }
+
+    @GetMapping("/all")
+    public List<ItemRequestDto> getAll() {
+        return itemRequestService.getAll();
+    }
+
+    @GetMapping("/{requestId}")
+    public ItemRequestWithItemsDto getById(@PathVariable Long requestId) {
+        return itemRequestService.getById(requestId);
+    }
 }

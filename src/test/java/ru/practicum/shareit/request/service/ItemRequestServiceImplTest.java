@@ -2,12 +2,11 @@ package ru.practicum.shareit.request.service;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
@@ -19,18 +18,16 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -64,7 +61,7 @@ class ItemRequestServiceImplTest {
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
-        when(itemRequestRepository.save(any(ItemRequest.class)))
+        when(itemRequestRepository.save(ArgumentMatchers.any(ItemRequest.class)))
                 .thenReturn(expectedRequest);
 
 
@@ -92,7 +89,7 @@ class ItemRequestServiceImplTest {
         when(userRepository.findById(anyLong()))
                 .thenAnswer(ignored -> Optional.of(testUser));
 
-        when(itemRequestRepository.save(any(ItemRequest.class)))
+        when(itemRequestRepository.save(ArgumentMatchers.any(ItemRequest.class)))
                 .thenReturn(expectedRequest);
 
 
@@ -115,7 +112,7 @@ class ItemRequestServiceImplTest {
         );
 
         List<ItemRequest> otherUserRequests = List.of(
-                new ItemRequest(3L, "other user 1", testUser, LocalDateTime.now(), List.of())
+                new ItemRequest(3L, "other user 1", otherUser, LocalDateTime.now(), List.of())
         );
 
         List<ItemRequestWithItemsDto> expectedList = testUserRequests.stream()
@@ -151,6 +148,63 @@ class ItemRequestServiceImplTest {
 
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemRequestService.getAllByOwnerId(testUser.getId()));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    void shouldReturnAllRequests() {
+        List<ItemRequest> requests = List.of(
+                new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), List.of()),
+                new ItemRequest(2L, "test user 2", testUser, LocalDateTime.now(), List.of()),
+                new ItemRequest(3L, "other user 1", testUser, LocalDateTime.now(), List.of())
+        );
+
+        List<ItemRequestDto> expecetedList = List.of(
+                new ItemRequestDto(1L, "test user 1", testUser.getId(), LocalDateTime.now()),
+                new ItemRequestDto(2L, "test user 2", testUser.getId(), LocalDateTime.now()),
+                new ItemRequestDto(3L, "other user 1", testUser.getId(), LocalDateTime.now())
+        );
+
+        when(itemRequestRepository.findAll(ArgumentMatchers.any(Sort.class)))
+                .thenReturn(requests);
+
+        List<ItemRequestDto> allRequests = itemRequestService.getAll();
+
+        assertThat(allRequests, hasSize(3));
+        assertThat(allRequests, equalTo(expecetedList));
+    }
+
+    @Test
+    void shouldReturnRequestWithGivenId() {
+        ItemRequest request = new ItemRequest(1L, "test user 1", testUser, LocalDateTime.now(), List.of());
+
+        when(itemRequestRepository.findById(anyLong()))
+                .thenAnswer(ignored -> Optional.of(request));
+
+        ItemRequestWithItemsDto requestDto = itemRequestService.getById(1L);
+
+        assertThat(requestDto, allOf(
+                hasProperty("id", equalTo(request.getId())),
+                hasProperty("description", equalTo(request.getDescription())),
+                hasProperty("userId", equalTo(request.getUser().getId())),
+                hasProperty("created", equalTo(request.getCreated())),
+                hasProperty("items", empty())
+        ));
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionIfRequestNotFound() {
+
+        long requestId = 1L;
+
+        String expectedMessage = String.format("Запрос с id=%d не найден", requestId);
+
+        when(itemRequestRepository.findById(1L))
+                .thenThrow(new NotFoundException(expectedMessage));
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemRequestService.getById(requestId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
     }

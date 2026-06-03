@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
@@ -50,11 +51,21 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAll() {
-        return List.of();
+
+        List<ItemRequest> allRequests = itemRequestRepository.findAll(Sort.by(Sort.Order.desc("created")));
+
+        return allRequests.stream()
+                .map(ItemRequestDtoMapper::mapToDto)
+                .toList();
     }
 
     @Override
-    public ItemRequestDto getById(Long requestId) {
-        return null;
+    public ItemRequestWithItemsDto getById(Long requestId) {
+
+        ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(
+                () -> new NotFoundException(String.format("Запрос с id=%d не найден", requestId))
+        );
+
+        return ItemRequestWithItemsDtoMapper.mapToDto(request);
     }
 }
