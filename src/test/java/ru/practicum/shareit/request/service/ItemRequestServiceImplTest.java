@@ -204,7 +204,7 @@ class ItemRequestServiceImplTest {
         String expectedMessage = String.format("Запрос с id=%d не найден", requestId);
 
         when(itemRequestRepository.findById(1L))
-                .thenThrow(new NotFoundException(expectedMessage));
+                .thenReturn(Optional.empty());
 
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemRequestService.getById(requestId));
@@ -249,5 +249,43 @@ class ItemRequestServiceImplTest {
                 hasItem(hasProperty("itemId", equalTo(existingItem.getId())))
         ));
 
+    }
+
+    @Test
+    void addItemShouldThrowExceptionIfRequestNotFound() {
+        long requestId = 1L;
+        long itemId = 1L;
+
+        String expectedMessage = String.format("Запрос с id=%d не найден", requestId);
+
+        when(itemRequestRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        when(itemRepository.findById(1L))
+                .thenReturn(Optional.of(new Item()));
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemRequestService.addItem(requestId, itemId));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    void addItemShouldThrowExceptionIfItemNotFound() {
+        long requestId = 1L;
+        long itemId = 1L;
+
+        String expectedMessage = String.format("Предмет с id=%d не найден", requestId);
+
+        when(itemRequestRepository.findById(1L))
+                .thenReturn(Optional.of(new ItemRequest()));
+
+        when(itemRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemRequestService.addItem(requestId, itemId));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
     }
 }

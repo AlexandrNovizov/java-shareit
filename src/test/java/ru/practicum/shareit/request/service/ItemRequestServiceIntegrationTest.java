@@ -4,11 +4,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestWithItemsDto;
@@ -19,6 +22,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,6 +39,7 @@ public class ItemRequestServiceIntegrationTest {
     private final EntityManager em;
     private final ItemRequestService itemRequestService;
     private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
     private final ItemRequestRepository itemRequestRepository;
 
     private User user = new User(
@@ -270,5 +275,107 @@ public class ItemRequestServiceIntegrationTest {
                 .collect(Collectors.toList());
 
         assertThat(actualOrder, equalTo(expectedOrder));
+    }
+
+    @Test
+    void shouldAddItemToRequest() {
+        user = userRepository.save(user);
+        ItemRequest request = new ItemRequest(
+                null, "test desc", user, LocalDateTime.now(), new HashSet<>()
+        );
+
+        Item item = new Item(
+                null, "test item", "test item desc", true, user
+        );
+        request = itemRequestRepository.save(request);
+        item = itemRepository.save(item);
+
+        ItemRequestWithItemsDto result = itemRequestService.addItem(request.getId(), item.getId());
+
+        assertThat(result.getItems(), hasSize(1));
+        assertThat(result.getItems(), hasItem(allOf(
+                hasProperty("itemId", equalTo(item.getId())),
+                hasProperty("name", equalTo(item.getName())),
+                hasProperty("ownerId", equalTo(item.getOwner().getId()))
+        )));
+    }
+
+    @Test
+    void shouldAddItemToRequestIfRequestItemsNotEmpty() {
+        user = userRepository.save(user);
+        Item existingItem = new Item(
+                null,
+                "ex item",
+                "ex item desc",
+                true,
+                user
+        );
+        existingItem = itemRepository.save(existingItem);
+
+        Set<Item> existingItems = new HashSet<>();
+        existingItems.add(existingItem);
+
+        ItemRequest request = new ItemRequest(
+                null, "test desc", user, LocalDateTime.now(), existingItems
+        );
+
+        Item item = new Item(
+                null, "test item", "test item desc", true, user
+        );
+        request = itemRequestRepository.save(request);
+        item = itemRepository.save(item);
+
+        ItemRequestWithItemsDto result = itemRequestService.addItem(request.getId(), item.getId());
+
+        assertThat(result.getItems(), hasSize(2));
+
+        assertThat(result.getItems(), allOf(
+                hasItem(allOf(
+                        hasProperty("itemId", equalTo(item.getId())),
+                        hasProperty("name", equalTo(item.getName())),
+                        hasProperty("ownerId", equalTo(item.getOwner().getId()))
+                )),
+                hasItem(allOf(
+                        hasProperty("itemId", equalTo(existingItem.getId())),
+                        hasProperty("name", equalTo(existingItem.getName())),
+                        hasProperty("ownerId", equalTo(existingItem.getOwner().getId()))
+                ))
+        ));
+    }
+
+    @Test
+    void addItemShouldThrowNotFoundExceptionIfRequestNotExists() {
+        long unExistingId = Long.MAX_VALUE;
+        String expectedMessage = String.format("Запрос с id=%d не найден", unExistingId);
+        user = userRepository.save(user);
+        Item item = new Item(
+                null, "test item", "test item desc", true, user
+        );
+        item = itemRepository.save(item);
+        long itemId = item.getId();
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemRequestService.addItem(unExistingId, itemId));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    void addItemShouldThrowNotFoundExceptionIfItemNotExists() {
+        long unExistingId = Long.MAX_VALUE;
+        String expectedMessage = String.format("Предмет с id=%d не найден", unExistingId);
+        user = userRepository.save(user);
+        ItemRequest request = new ItemRequest(
+                null,
+                "test desc",
+                user,
+                LocalDateTime.now(),
+                new HashSet<>()
+        );
+        request = itemRequestRepository.save(request);
+        long requestId = request.getId();
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemRequestService.addItem(requestId, unExistingId));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
     }
 }
