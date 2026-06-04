@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -17,6 +18,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +75,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public ItemRequestWithItemsDto addItem(Long requestId, Long itemId) {
+    public ItemRequestWithItemsDto addItem(Long userId, Long requestId, Long itemId) {
+        userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", requestId))
+        );
+
         ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(
                 () -> new NotFoundException(String.format("Запрос с id=%d не найден", requestId))
         );
@@ -81,6 +87,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет с id=%d не найден", itemId))
         );
+
+        if (!Objects.equals(item.getOwner().getId(), userId)) {
+            throw new AccessDeniedException(String.format(
+                    "Пользователь с id=%d не является владельцем вещи с id=%d", userId, item.getId()
+            ));
+        }
 
         if (!request.getItems().contains(item)) {
             request.getItems().add(item);

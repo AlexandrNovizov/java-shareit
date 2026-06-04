@@ -289,7 +289,7 @@ public class ItemRequestServiceIntegrationTest {
         request = itemRequestRepository.save(request);
         item = itemRepository.save(item);
 
-        ItemRequestWithItemsDto result = itemRequestService.addItem(request.getId(), item.getId());
+        ItemRequestWithItemsDto result = itemRequestService.addItem(user.getId(), request.getId(), item.getId());
 
         assertThat(result.getItems(), hasSize(1));
         assertThat(result.getItems(), hasItem(allOf(
@@ -324,7 +324,7 @@ public class ItemRequestServiceIntegrationTest {
         request = itemRequestRepository.save(request);
         item = itemRepository.save(item);
 
-        ItemRequestWithItemsDto result = itemRequestService.addItem(request.getId(), item.getId());
+        ItemRequestWithItemsDto result = itemRequestService.addItem(user.getId(), request.getId(), item.getId());
 
         assertThat(result.getItems(), hasSize(2));
 
@@ -353,7 +353,7 @@ public class ItemRequestServiceIntegrationTest {
         item = itemRepository.save(item);
         long itemId = item.getId();
         Throwable exception = assertThrows(NotFoundException.class,
-                () -> itemRequestService.addItem(unExistingId, itemId));
+                () -> itemRequestService.addItem(user.getId(), unExistingId, itemId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
     }
@@ -373,7 +373,7 @@ public class ItemRequestServiceIntegrationTest {
         request = itemRequestRepository.save(request);
         long requestId = request.getId();
         Throwable exception = assertThrows(NotFoundException.class,
-                () -> itemRequestService.addItem(requestId, unExistingId));
+                () -> itemRequestService.addItem(user.getId(), requestId, unExistingId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
     }

@@ -241,7 +241,7 @@ class ItemRequestServiceImplTest {
         when(itemRepository.findById(anyLong()))
                 .thenAnswer(ignored -> Optional.of(item));
 
-        ItemRequestWithItemsDto requestDto = itemRequestService.addItem(requestId, itemId);
+        ItemRequestWithItemsDto requestDto = itemRequestService.addItem(testUser.getId(), requestId, itemId);
 
         assertThat(requestDto.getItems(), hasSize(2));
         assertThat(requestDto.getItems(), allOf(
@@ -264,8 +264,11 @@ class ItemRequestServiceImplTest {
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.of(new Item()));
 
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(testUser));
+
         Throwable exception = assertThrows(NotFoundException.class,
-                () -> itemRequestService.addItem(requestId, itemId));
+                () -> itemRequestService.addItem(testUser.getId(), requestId, itemId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
     }
@@ -283,8 +286,11 @@ class ItemRequestServiceImplTest {
         when(itemRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(testUser));
+
         Throwable exception = assertThrows(NotFoundException.class,
-                () -> itemRequestService.addItem(requestId, itemId));
+                () -> itemRequestService.addItem(testUser.getId(), requestId, itemId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
     }

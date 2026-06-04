@@ -41,8 +41,9 @@ public class ItemRequestController {
 
     @PatchMapping("/{requestId}/add/{itemId}")
     public ItemRequestWithItemsDto addItemToRequest(@PathVariable Long requestId,
-                                                    @PathVariable Long itemId) {
+                                                    @PathVariable Long itemId,
+                                                    @RequestHeader("X-Sharer-User-Id") Long userId) {
 
-        return itemRequestService.addItem(requestId, itemId);
+        return itemRequestService.addItem(userId, requestId, itemId);
     }
 }
