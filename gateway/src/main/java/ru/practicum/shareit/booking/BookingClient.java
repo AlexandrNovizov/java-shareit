@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -27,21 +28,32 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookings(long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> getAllBookingsByUserId(long userId, BookingState state) {
         Map<String, Object> parameters = Map.of(
-                "state", state.name(),
-                "from", from,
-                "size", size
+                "state", state.name()
         );
-        return get("?state={state}&from={from}&size={size}", userId, parameters);
+        return get("?state={state}", userId, parameters);
     }
 
+    public ResponseEntity<Object> getAllBookingsByOwnerId(long ownerId, BookingState state) {
+        Map<String, Object> parameters = Map.of(
+                "state", state.name()
+        );
+        return get("/owner?state={state}", ownerId, parameters);
+    }
+
+    public ResponseEntity<Object> approveBooking(long userId, long bookingId, boolean approved) {
+        Map<String, Object> parameters = Map.of(
+                "approved", approved
+        );
+        return patch("/" + bookingId + "?approved={approved}", userId, parameters, null);
+    }
 
     public ResponseEntity<Object> bookItem(long userId, CreateBookingDto requestDto) {
         return post("", userId, requestDto);
     }
 
-    public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
+    public ResponseEntity<Object> getBooking(long userId, long bookingId) {
         return get("/" + bookingId, userId);
     }
 }

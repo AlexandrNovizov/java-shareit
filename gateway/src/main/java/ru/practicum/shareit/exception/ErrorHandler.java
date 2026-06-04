@@ -18,6 +18,6 @@ public class ErrorHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
-        return new ErrorResponse("Внутренняя ошибка сервера", e.getMessage());
+        return new ErrorResponse("Внутренняя ошибка шлюза", e.getMessage());
     }
 }

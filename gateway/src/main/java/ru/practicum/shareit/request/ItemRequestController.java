@@ -1,0 +1,46 @@
+package ru.practicum.shareit.request;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.request.dto.CreateItemRequestDto;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping(path = "/requests")
+public class ItemRequestController {
+
+    private final ItemRequestClient itemRequestClient;
+
+    @PostMapping
+    public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                         @RequestBody @Valid CreateItemRequestDto dto) {
+
+        return itemRequestClient.createRequest(userId, dto);
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> getRequestsByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+
+        return itemRequestClient.getAllByOwnerId(ownerId);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Object> getAll() {
+        return itemRequestClient.getAll();
+    }
+
+    @GetMapping("/{requestId}")
+    public ResponseEntity<Object> getById(@PathVariable Long requestId) {
+        return itemRequestClient.getRequest(requestId);
+    }
+
+    @PatchMapping("/{requestId}/add/{itemId}")
+    public ResponseEntity<Object> addItemToRequest(@PathVariable Long requestId,
+                                                   @PathVariable Long itemId,
+                                                   @RequestHeader("X-Sharer-User-Id") Long userId) {
+
+        return itemRequestClient.addItem(userId, requestId, itemId);
+    }
+}
