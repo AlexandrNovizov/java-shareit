@@ -235,6 +235,9 @@ class ItemRequestServiceImplTest {
                 testUser
         );
 
+        when(userRepository.findById(anyLong()))
+                .thenAnswer(ignored -> Optional.of(testUser));
+
         when(itemRequestRepository.findById(anyLong()))
                 .thenAnswer(ignored -> Optional.of(request));
 
@@ -288,6 +291,28 @@ class ItemRequestServiceImplTest {
 
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(testUser));
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemRequestService.addItem(testUser.getId(), requestId, itemId));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    void addItemShouldThrowExceptionIfUserNotFound() {
+        long requestId = 1L;
+        long itemId = 1L;
+
+        String expectedMessage = String.format("Пользователь с id=%d не найден", testUser.getId());
+
+        when(itemRequestRepository.findById(1L))
+                .thenReturn(Optional.of(new ItemRequest()));
+
+        when(itemRepository.findById(1L))
+                .thenReturn(Optional.of(new Item()));
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
 
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemRequestService.addItem(testUser.getId(), requestId, itemId));

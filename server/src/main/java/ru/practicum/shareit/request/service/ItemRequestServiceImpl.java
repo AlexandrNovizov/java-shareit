@@ -77,7 +77,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestWithItemsDto addItem(Long userId, Long requestId, Long itemId) {
         userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", requestId))
+                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
         );
 
         ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(

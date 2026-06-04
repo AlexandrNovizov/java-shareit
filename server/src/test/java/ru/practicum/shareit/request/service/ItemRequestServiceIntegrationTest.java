@@ -352,6 +352,7 @@ public class ItemRequestServiceIntegrationTest {
         );
         item = itemRepository.save(item);
         long itemId = item.getId();
+
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemRequestService.addItem(user.getId(), unExistingId, itemId));
 
@@ -374,6 +375,32 @@ public class ItemRequestServiceIntegrationTest {
         long requestId = request.getId();
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemRequestService.addItem(user.getId(), requestId, unExistingId));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
+    }
+
+    @Test
+    void addItemShouldThrowNotFoundExceptionIfUserNotExists() {
+        long unExistingId = Long.MAX_VALUE;
+        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistingId);
+        user = userRepository.save(user);
+        Item item = new Item(
+                null, "test item", "test item desc", true, user
+        );
+        item = itemRepository.save(item);
+        ItemRequest request = new ItemRequest(
+                null,
+                "test desc",
+                user,
+                LocalDateTime.now(),
+                new HashSet<>()
+        );
+        request = itemRequestRepository.save(request);
+        long requestId = request.getId();
+        long itemId = item.getId();
+
+        Throwable exception = assertThrows(NotFoundException.class,
+                () -> itemRequestService.addItem(unExistingId, requestId, itemId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
     }
