@@ -1,17 +1,22 @@
 package ru.practicum.shareit.user;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.user.dto.CreateUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 
 @Service
+@Validated
 public class UserClient extends BaseClient {
 
     private static final String API_PREFIX = "/users";
@@ -26,19 +31,19 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> createUser(CreateUserDto dto) {
+    public ResponseEntity<Object> createUser(@Valid CreateUserDto dto) {
         return post("", dto);
     }
 
-    public ResponseEntity<Object> getUser(Long userId) {
+    public ResponseEntity<Object> getUser(@Positive long userId) {
         return get("/" + userId);
     }
 
-    public ResponseEntity<Object> updateUser(Long userId, UpdateUserDto dto) {
+    public ResponseEntity<Object> updateUser(@Positive long userId, UpdateUserDto dto) {
         return patch("/" + userId, dto);
     }
 
-    public ResponseEntity<Object> deleteUser(Long userId) {
+    public ResponseEntity<Object> deleteUser(@Positive long userId) {
         return delete("/" + userId);
     }
 }

@@ -11,7 +11,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConstraintViolation(ConstraintViolationException e) {
+    public ErrorResponse handleConstraintViolationException(ConstraintViolationException e) {
         return new ErrorResponse("Ошибка валидации", e.getMessage());
     }
 

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -29,19 +31,22 @@ public class ItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getItem(long userId, Long itemId) {
+    public ResponseEntity<Object> getItem(@Positive long userId, @Positive long itemId) {
+
         return get("/" + itemId, userId);
     }
 
-    public ResponseEntity<Object> createItem(long userId, CreateItemDto dto) {
+    public ResponseEntity<Object> createItem(@Positive long userId, @Valid CreateItemDto dto) {
+
         return post("", userId, dto);
     }
 
-    public ResponseEntity<Object> updateItem(long userId, Long itemId, UpdateItemDto dto) {
+    public ResponseEntity<Object> updateItem(@Positive long userId, @Positive long itemId, UpdateItemDto dto) {
+
         return patch("/" + itemId, userId, dto);
     }
 
-    public ResponseEntity<Object> getAllByOwnerId(long ownerId) {
+    public ResponseEntity<Object> getAllByOwnerId(@Positive long ownerId) {
         return get("", ownerId);
     }
 
@@ -52,7 +57,8 @@ public class ItemClient extends BaseClient {
         return get("?text={text}", null, parameters);
     }
 
-    public ResponseEntity<Object> addComment(long ownerId, Long itemId, CreateCommentDto dto) {
+    public ResponseEntity<Object> addComment(@Positive long ownerId, @Positive long itemId, @Valid CreateCommentDto dto) {
+
         return post("/" + itemId + "/comment", ownerId, dto);
     }
 
