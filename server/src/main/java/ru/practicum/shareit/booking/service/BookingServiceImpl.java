@@ -81,6 +81,10 @@ public class BookingServiceImpl implements BookingService {
                 () -> new NotFoundException(String.format("Бронирование с id=%d не найдено", bookingId))
         );
 
+        userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
+        );
+
         if (!userId.equals(booking.getBooker().getId()) &&
                 !userId.equals(booking.getItem().getOwner().getId())) {
 
@@ -121,7 +125,7 @@ public class BookingServiceImpl implements BookingService {
 
     private static void validateBooking(CreateBookingDto dto) {
         if (dto.getStart().equals(dto.getEnd())) {
-            throw new ConditionsNotMetException("Время начала бронирования не может быть равна времени конца");
+            throw new ConditionsNotMetException("Время начала бронирования не может быть равно времени конца");
         }
 
         if (dto.getStart().isAfter(dto.getEnd())) {

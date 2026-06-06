@@ -30,7 +30,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking AS b " +
             "JOIN FETCH b.booker " +
             "WHERE b.booker.id = ?1 " +
-            "AND b.status = 'ACCEPTED'" +
+            "AND b.status = 'APPROVED'" +
             "AND b.start <= CURRENT_DATE " +
             "AND b.`end` >= CURRENT_DATE " +
             "ORDER BY b.start DESC")
@@ -39,7 +39,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking AS b " +
             "JOIN FETCH b.booker " +
             "WHERE b.booker.id = ?1 " +
-            "AND b.status = 'ACCEPTED'" +
+            "AND b.status = 'APPROVED'" +
             "AND b.`end` < CURRENT_DATE " +
             "ORDER BY b.start DESC")
     List<Booking> getPastBookingsByBookerId(Long bookerId);
@@ -47,7 +47,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking AS b " +
             "JOIN FETCH b.booker " +
             "WHERE b.booker.id = ?1 " +
-            "AND b.status = 'ACCEPTED'" +
+            "AND b.status = 'APPROVED'" +
             "AND b.start > CURRENT_DATE " +
             "ORDER BY b.start DESC")
     List<Booking> getFutureBookingsByBookerId(Long bookerId);
@@ -77,7 +77,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.item " +
             "JOIN FETCH b.item.owner AS owner " +
             "WHERE owner.id = ?1 " +
-            "AND b.status = 'ACCEPTED'" +
+            "AND b.status = 'APPROVED'" +
             "AND b.start <= CURRENT_DATE " +
             "AND b.`end` >= CURRENT_DATE " +
             "ORDER BY b.start DESC")
@@ -87,7 +87,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.item " +
             "JOIN FETCH b.item.owner AS owner " +
             "WHERE owner.id = ?1 " +
-            "AND b.status = 'ACCEPTED'" +
+            "AND b.status = 'APPROVED'" +
             "AND b.`end` < CURRENT_DATE " +
             "ORDER BY b.start DESC")
     List<Booking> getPastBookingsByOwnerId(Long ownerId);
@@ -96,7 +96,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.item " +
             "JOIN FETCH b.item.owner AS owner " +
             "WHERE owner.id = ?1 " +
-            "AND b.status = 'ACCEPTED'" +
+            "AND b.status = 'APPROVED'" +
             "AND b.start > CURRENT_DATE " +
             "ORDER BY b.start DESC")
     List<Booking> getFutureBookingsByOwnerId(Long ownerId);
@@ -123,7 +123,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "MIN(CASE WHEN b.start > CURRENT_TIMESTAMP THEN b.start ELSE NULL END))" +
             "FROM Booking AS b " +
             "JOIN b.item AS i " +
-            "WHERE b.status = 'ACCEPTED' AND " +
+            "WHERE b.status = 'APPROVED' AND " +
             "i.id IN :ids " +
             "GROUP BY i.id")
     List<LastAndNextBooking> getLastAndNextBookingForIds(

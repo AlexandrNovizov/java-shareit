@@ -50,7 +50,6 @@ public class ItemServiceImpl implements ItemService {
         Item createdItem = itemRepository.save(ItemDtoMapper.mapToItem(newItem, owner));
 
         if (request != null) {
-
             if (!request.getItems().contains(createdItem)) {
                 request.getItems().add(createdItem);
                 itemRequestRepository.save(request);
@@ -82,6 +81,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getById(Long itemId, Long userId) {
         Item item = getItemOrThrowException(itemId);
+
+        getUserOrThrowException(userId);
 
         ItemDto dto = ItemDtoMapper.mapToDto(item);
 
@@ -128,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
 
         Map<Long, List<Comment>> comments = commentRepository.findCommentsByItemOwnerId(ownerId)
                 .stream()
-                .collect(Collectors.groupingBy(comment -> comment.getUser().getId()));
+                .collect(Collectors.groupingBy(comment -> comment.getItem().getId()));
 
         for (ItemDto itemDto : itemDtos) {
             List<CommentDto> commentDtos = comments.getOrDefault(itemDto.getId(), new ArrayList<>())
@@ -156,13 +157,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto addComment(CreateCommentDto newComment, Long itemId, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
+        User user = getUserOrThrowException(userId);
 
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException(String.format("Предмет с id=%d не найден", itemId))
-        );
+        Item item = getItemOrThrowException(itemId);
 
         if (!bookingRepository.hasItemBookedByUser(itemId, userId)) {
             throw new ConditionsNotMetException(
