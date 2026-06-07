@@ -184,7 +184,7 @@ class ItemServiceImplTest {
 
         assertThat(result.getId(), equalTo(itemId));
         assertThat(result.getName(), equalTo(updateItem.getName()));
-        assertThat(result.getDescription() ,equalTo(updateItem.getDescription()));
+        assertThat(result.getDescription(), equalTo(updateItem.getDescription()));
         assertThat(result.getAvailable(), equalTo(updateItem.getAvailable()));
         verify(itemRepository, times(1)).save(ArgumentMatchers.any(Item.class));
     }

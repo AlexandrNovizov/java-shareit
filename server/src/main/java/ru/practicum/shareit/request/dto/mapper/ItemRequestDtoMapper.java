@@ -28,6 +28,4 @@ public class ItemRequestDtoMapper {
 
         return dto;
     }
-
-
 }
