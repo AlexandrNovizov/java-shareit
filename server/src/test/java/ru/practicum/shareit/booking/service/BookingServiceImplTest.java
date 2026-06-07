@@ -181,10 +181,11 @@ class BookingServiceImplTest {
     @Test
     void create_WhenStartDateEqualsToEndDate_ShouldThrowException() {
         String expectedMessage = "Время начала бронирования не может быть равно времени конца";
+        LocalDateTime now = LocalDateTime.now();
         CreateBookingDto invalidBooking = new CreateBookingDto(
                 bookingId,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                now,
+                now
         );
 
         when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
