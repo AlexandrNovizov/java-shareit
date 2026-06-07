@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -252,6 +253,53 @@ class ItemRequestServiceImplTest {
                 hasItem(hasProperty("itemId", equalTo(existingItem.getId())))
         ));
 
+    }
+
+    @Test
+    void addItemShouldThrowExceptionIfUserIsNotOwner() {
+        User otherUser = new User(2L, "other@mail.ru", "otherName");
+
+        long requestId = 1;
+        long itemId = 1;
+
+        Item existingItem = new Item(
+                2L,
+                "ex",
+                "e",
+                true,
+                testUser
+        );
+        Set<Item> items = new HashSet<>();
+        items.add(existingItem);
+
+        ItemRequest request = new ItemRequest(requestId, "test user 1", testUser, LocalDateTime.now(), items);
+        Item item = new Item(
+                itemId,
+                "testName",
+                "test desc",
+                true,
+                testUser
+        );
+        String expectedMessage = String.format(
+                "Пользователь с id=%d не является владельцем вещи с id=%d", otherUser.getId(), item.getId()
+        );
+
+        when(userRepository.findById(testUser.getId()))
+                .thenAnswer(ignored -> Optional.of(testUser));
+
+        when(userRepository.findById(otherUser.getId()))
+                .thenReturn(Optional.of(otherUser));
+
+        when(itemRequestRepository.findById(anyLong()))
+                .thenAnswer(ignored -> Optional.of(request));
+
+        when(itemRepository.findById(anyLong()))
+                .thenAnswer(ignored -> Optional.of(item));
+
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+                () -> itemRequestService.addItem(otherUser.getId(), requestId, itemId));
+
+        assertThat(exception.getMessage(), equalTo(expectedMessage));
     }
 
     @Test
