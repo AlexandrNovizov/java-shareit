@@ -4,12 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import ru.practicum.shareit.booking.dto.BookingState;
@@ -40,7 +38,7 @@ class BookingClientTest {
     private CreateBookingDto testCreateBookingDto;
     private BookingState testBookingState;
     private BookingClient bookingClient;
-    private final String URL = "http://localhost:9090";
+    private final String serverUrl = "http://localhost:9090";
 
     @BeforeEach
     void setup() {
@@ -56,7 +54,7 @@ class BookingClientTest {
 
         testCreateBookingDto = new CreateBookingDto();
         testBookingState = BookingState.ALL;
-        bookingClient = new BookingClient(URL, builder);
+        bookingClient = new BookingClient(serverUrl, builder);
     }
 
     @Test

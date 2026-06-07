@@ -31,7 +31,7 @@ class ItemRequestClientTest {
 
     private ItemRequestClient itemRequestClient;
 
-    private final String URL = "http://localhost:9090";
+    private final String serverUrl = "http://localhost:9090";
     private static final long USER_ID = 1L;
     private static final long OWNER_ID = 2L;
     private static final long REQUEST_ID = 3L;
@@ -54,7 +54,7 @@ class ItemRequestClientTest {
 
         createItemRequestDto = new CreateItemRequestDto("Test Desc");
 
-        itemRequestClient = new ItemRequestClient(URL, builder);
+        itemRequestClient = new ItemRequestClient(serverUrl, builder);
     }
 
     @Test

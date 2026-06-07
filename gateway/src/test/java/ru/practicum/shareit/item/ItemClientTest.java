@@ -10,9 +10,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.shareit.booking.BookingClient;
-import ru.practicum.shareit.booking.dto.BookingState;
-import ru.practicum.shareit.booking.dto.CreateBookingDto;
 import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.CreateItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
@@ -41,7 +38,7 @@ class ItemClientTest {
     private CreateItemDto createItemDto;
     private UpdateItemDto updateItemDto;
     private CreateCommentDto createCommentDto;
-    private final String URL = "http://localhost:9090";
+    private final String serverUrl = "http://localhost:9090";
     private static final long VALID_USER_ID = 1L;
     private static final long VALID_ITEM_ID = 2L;
     private static final String QUERY = "test query";
@@ -61,7 +58,7 @@ class ItemClientTest {
         createItemDto = new CreateItemDto();
         updateItemDto = new UpdateItemDto();
         createCommentDto = new CreateCommentDto();
-        itemClient = new ItemClient(URL, builder);
+        itemClient = new ItemClient(serverUrl, builder);
     }
 
     @Test

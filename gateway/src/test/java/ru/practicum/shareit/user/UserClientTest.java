@@ -10,17 +10,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.shareit.request.ItemRequestClient;
-import ru.practicum.shareit.request.dto.CreateItemRequestDto;
 import ru.practicum.shareit.user.dto.CreateUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,7 +32,7 @@ class UserClientTest {
 
     private UserClient userClient;
 
-    private final String URL = "http://localhost:9090";
+    private final String serverUrl = "http://localhost:9090";
     private static final long VALID_USER_ID = 1L;
 
     private CreateUserDto createUserDto;
@@ -58,7 +54,7 @@ class UserClientTest {
         createUserDto = new CreateUserDto();
         updateUserDto = new UpdateUserDto();
 
-        userClient = new UserClient(URL, builder);
+        userClient = new UserClient(serverUrl, builder);
     }
 
     @Test
