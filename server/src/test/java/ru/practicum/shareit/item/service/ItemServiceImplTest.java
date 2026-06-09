@@ -106,9 +106,9 @@ class ItemServiceImplTest {
         assertThat(result.getDescription(), equalTo(item.getDescription()));
         assertThat(result.getAvailable(), equalTo(item.getAvailable()));
 
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository).findById(userId);
         verify(itemRequestRepository, never()).findById(anyLong());
-        verify(itemRepository, times(1)).save(ArgumentMatchers.any(Item.class));
+        verify(itemRepository).save(ArgumentMatchers.any(Item.class));
         verify(itemRequestRepository, never()).save(any());
     }
 
@@ -127,15 +127,15 @@ class ItemServiceImplTest {
         assertThat(result.getDescription(), equalTo(item.getDescription()));
         assertThat(result.getAvailable(), equalTo(item.getAvailable()));
 
-        verify(userRepository, times(1)).findById(userId);
-        verify(itemRequestRepository, times(1)).findById(requestId);
-        verify(itemRepository, times(1)).save(ArgumentMatchers.any(Item.class));
-        verify(itemRequestRepository, times(1)).save(any());
+        verify(userRepository).findById(userId);
+        verify(itemRequestRepository).findById(requestId);
+        verify(itemRepository).save(ArgumentMatchers.any(Item.class));
+        verify(itemRequestRepository).save(any());
     }
 
     @Test
     void create_WhenOwnerNotFound_ShouldThrowNotFoundException() {
-        String expectedMessage = String.format("Пользователь с id=%d не найден", userId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", userId);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         Throwable exception = assertThrows(NotFoundException.class,
@@ -143,14 +143,14 @@ class ItemServiceImplTest {
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
 
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository).findById(userId);
         verify(itemRequestRepository, never()).findById(requestId);
         verify(itemRepository, never()).save(any());
     }
 
     @Test
     void create_WhenRequestNotFound_ShouldThrowNotFoundException() {
-        String expectedMessage = String.format("Запрос с id=%d не найден", requestId);
+        String expectedMessage = String.format("Запрос с id=%d не найден(-о)", requestId);
         newItem.setRequestId(requestId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -162,8 +162,8 @@ class ItemServiceImplTest {
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
 
-        verify(userRepository, times(1)).findById(userId);
-        verify(itemRequestRepository, times(1)).findById(requestId);
+        verify(userRepository).findById(userId);
+        verify(itemRequestRepository).findById(requestId);
         verify(itemRepository, never()).save(any());
     }
 
@@ -186,7 +186,7 @@ class ItemServiceImplTest {
         assertThat(result.getName(), equalTo(updateItem.getName()));
         assertThat(result.getDescription(), equalTo(updateItem.getDescription()));
         assertThat(result.getAvailable(), equalTo(updateItem.getAvailable()));
-        verify(itemRepository, times(1)).save(ArgumentMatchers.any(Item.class));
+        verify(itemRepository).save(ArgumentMatchers.any(Item.class));
     }
 
     @Test
@@ -226,7 +226,7 @@ class ItemServiceImplTest {
         assertThrows(NotFoundException.class,
                 () -> itemService.update(updateItem, itemId, unExistingId));
 
-        verify(userRepository, times(1)).findById(unExistingId);
+        verify(userRepository).findById(unExistingId);
     }
 
     @Test
@@ -239,7 +239,7 @@ class ItemServiceImplTest {
                 .thenReturn(java.util.Optional.empty());
 
         assertThrows(NotFoundException.class, () -> itemService.update(updateItem, unExistingId, userId));
-        verify(itemRepository, times(1)).findById(unExistingId);
+        verify(itemRepository).findById(unExistingId);
     }
 
     @Test
@@ -282,10 +282,10 @@ class ItemServiceImplTest {
         assertThat(result.getLastBooking(), equalTo(bookingInfos.get(0).getLast()));
         assertThat(result.getNextBooking(), equalTo(bookingInfos.get(0).getNext()));
         assertThat(result.getComments(), empty());
-        verify(userRepository, times(1)).findById(userId);
-        verify(itemRepository, times(1)).findById(itemId);
-        verify(bookingRepository, times(1)).getLastAndNextBookingForIds(List.of(itemId));
-        verify(commentRepository, times(1)).findCommentsByItemId(itemId);
+        verify(userRepository).findById(userId);
+        verify(itemRepository).findById(itemId);
+        verify(bookingRepository).getLastAndNextBookingForIds(List.of(itemId));
+        verify(commentRepository).findCommentsByItemId(itemId);
     }
 
     @Test
@@ -311,7 +311,7 @@ class ItemServiceImplTest {
 
     @Test
     void getById_WhenItemDoesNotExist_ShouldThrowException() {
-        String exceptionMessage = String.format("Предмет с id=%d не найден", itemId);
+        String exceptionMessage = String.format("Предмет с id=%d не найден(-о)", itemId);
         when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
@@ -319,14 +319,14 @@ class ItemServiceImplTest {
                 () -> itemService.getById(itemId, userId));
 
         assertThat(exception.getMessage(), equalTo(exceptionMessage));
-        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository).findById(itemId);
         verify(bookingRepository, never()).getLastAndNextBookingForIds(any());
         verify(commentRepository, never()).findCommentsByItemId(anyLong());
     }
 
     @Test
     void getById_WhenUserDoesNotExist_ShouldThrowException() {
-        String expectedMessage = String.format("Пользователь с id=%d не найден", userId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", userId);
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -334,7 +334,7 @@ class ItemServiceImplTest {
                 () -> itemService.getById(itemId, userId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository).findById(itemId);
         verify(bookingRepository, never()).getLastAndNextBookingForIds(any());
         verify(commentRepository, never()).findCommentsByItemId(anyLong());
     }
@@ -367,8 +367,8 @@ class ItemServiceImplTest {
         assertThat(dto.getText(), equalTo(comment.getText()));
         assertThat(dto.getCreated(), equalTo(comment.getCreated()));
         assertThat(dto.getAuthorName(), equalTo(comment.getUser().getName()));
-        verify(itemRepository, times(1)).findById(itemId);
-        verify(commentRepository, times(1)).findCommentsByItemId(itemId);
+        verify(itemRepository).findById(itemId);
+        verify(commentRepository).findCommentsByItemId(itemId);
     }
 
     @Test
@@ -383,7 +383,7 @@ class ItemServiceImplTest {
         assertThat(result.getId(), equalTo(itemId));
         assertThat(result.getNextBooking(), nullValue());
         assertThat(result.getLastBooking(), nullValue());
-        verify(bookingRepository, times(1)).getLastAndNextBookingForIds(List.of(itemId));
+        verify(bookingRepository).getLastAndNextBookingForIds(List.of(itemId));
     }
 
     @Test
@@ -405,9 +405,9 @@ class ItemServiceImplTest {
         assertThat(result.get(0).getComments().get(0).getText(), equalTo(comment.getText()));
         assertThat(result.get(0).getLastBooking(), equalTo(booking.getLast()));
         assertThat(result.get(0).getNextBooking(), equalTo(booking.getNext()));
-        verify(itemRepository, times(1)).findByOwnerId(userId);
-        verify(bookingRepository, times(1)).getLastAndNextBookingForIds(List.of(itemId));
-        verify(commentRepository, times(1)).findCommentsByItemOwnerId(userId);
+        verify(itemRepository).findByOwnerId(userId);
+        verify(bookingRepository).getLastAndNextBookingForIds(List.of(itemId));
+        verify(commentRepository).findCommentsByItemOwnerId(userId);
     }
 
     @Test
@@ -418,21 +418,21 @@ class ItemServiceImplTest {
         List<ItemDto> result = itemService.getAllByOwnerId(userId);
 
         assertThat(result, is(empty()));
-        verify(itemRepository, times(1)).findByOwnerId(userId);
+        verify(itemRepository).findByOwnerId(userId);
         verify(bookingRepository, never()).getLastAndNextBookingForIds(any());
         verify(commentRepository, never()).findCommentsByItemOwnerId(any());
     }
 
     @Test
     void getAllByOwnerId_WhenUserNotFound_ShouldThrowException() {
-        String expectedMessage = String.format("Пользователь с id=%d не найден", userId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", userId);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemService.getAllByOwnerId(userId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository).findById(userId);
         verify(itemRepository, never()).findByOwnerId(any());
     }
 
@@ -467,7 +467,7 @@ class ItemServiceImplTest {
         assertThat(dto.getText(), equalTo(comment.getText()));
         assertThat(dto.getCreated(), equalTo(comment.getCreated()));
         assertThat(dto.getAuthorName(), equalTo(comment.getUser().getName()));
-        verify(bookingRepository, times(1)).getLastAndNextBookingForIds(List.of(itemId));
+        verify(bookingRepository).getLastAndNextBookingForIds(List.of(itemId));
     }
 
     @Test
@@ -488,7 +488,7 @@ class ItemServiceImplTest {
         assertThat(result.get(0).getComments(), is(empty()));
         assertThat(result.get(0).getLastBooking(), equalTo(booking.getLast()));
         assertThat(result.get(0).getNextBooking(), equalTo(booking.getNext()));
-        verify(commentRepository, times(1)).findCommentsByItemOwnerId(userId);
+        verify(commentRepository).findCommentsByItemOwnerId(userId);
     }
 
     @Test
@@ -509,7 +509,7 @@ class ItemServiceImplTest {
         List<ItemDto> result = itemService.search(query);
 
         assertThat(result, empty());
-        verify(itemRepository, times(1)).searchByQuery(query);
+        verify(itemRepository).searchByQuery(query);
     }
 
     @Test
@@ -522,7 +522,7 @@ class ItemServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getDescription(), equalTo(item.getDescription()));
-        verify(itemRepository, times(1)).searchByQuery(query);
+        verify(itemRepository).searchByQuery(query);
     }
 
     @Test
@@ -542,15 +542,15 @@ class ItemServiceImplTest {
         assertThat(result.getAuthorName(), equalTo(user.getName()));
         assertThat(result.getCreated(), equalTo(expectedComment.getCreated()));
 
-        verify(userRepository, times(1)).findById(userId);
-        verify(itemRepository, times(1)).findById(itemId);
-        verify(bookingRepository, times(1)).hasItemBookedByUser(itemId, userId);
-        verify(commentRepository, times(1)).save(ArgumentMatchers.any(Comment.class));
+        verify(userRepository).findById(userId);
+        verify(itemRepository).findById(itemId);
+        verify(bookingRepository).hasItemBookedByUser(itemId, userId);
+        verify(commentRepository).save(ArgumentMatchers.any(Comment.class));
     }
 
     @Test
     void addComment_UserNotFound_ThrowsException() {
-        String expectedMessage = String.format("Пользователь с id=%d не найден", userId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", userId);
         CreateCommentDto newComment = new CreateCommentDto("text");
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
@@ -559,14 +559,14 @@ class ItemServiceImplTest {
                 () -> itemService.addComment(newComment, itemId, userId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository).findById(userId);
         verify(bookingRepository, never()).hasItemBookedByUser(any(), any());
         verify(commentRepository, never()).save(any());
     }
 
     @Test
     void addComment_ItemNotFound_ThrowsException() {
-        String expectedMessage = String.format("Предмет с id=%d не найден", itemId);
+        String expectedMessage = String.format("Предмет с id=%d не найден(-о)", itemId);
         CreateCommentDto newComment = new CreateCommentDto("text");
         when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
         when(itemRepository.findById(itemId)).thenReturn(java.util.Optional.empty());
@@ -575,7 +575,7 @@ class ItemServiceImplTest {
                 () -> itemService.addComment(newComment, itemId, userId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository).findById(itemId);
         verify(bookingRepository, never()).hasItemBookedByUser(any(), any());
         verify(commentRepository, never()).save(any());
     }
@@ -592,7 +592,7 @@ class ItemServiceImplTest {
                 () -> itemService.addComment(newComment, itemId, userId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(bookingRepository, times(1)).hasItemBookedByUser(itemId, userId);
+        verify(bookingRepository).hasItemBookedByUser(itemId, userId);
         verify(commentRepository, never()).save(any());
     }
 }

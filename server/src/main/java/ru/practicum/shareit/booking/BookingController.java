@@ -16,17 +16,18 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingDto create(@RequestHeader(USER_ID_HEADER) Long userId,
                              @RequestBody CreateBookingDto dto) {
 
         return bookingService.create(dto, userId);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto approve(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingDto approve(@RequestHeader(USER_ID_HEADER) Long userId,
                               @PathVariable Long bookingId,
                               @RequestParam Boolean approved) {
 
@@ -34,7 +35,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingDto getById(@RequestHeader(USER_ID_HEADER) Long userId,
                               @PathVariable Long bookingId) {
 
         return bookingService.getById(bookingId, userId);

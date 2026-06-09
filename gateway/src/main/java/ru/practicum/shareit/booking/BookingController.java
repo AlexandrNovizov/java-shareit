@@ -13,17 +13,18 @@ import ru.practicum.shareit.booking.dto.CreateBookingDto;
 public class BookingController {
 
     private final BookingClient bookingClient;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> create(@RequestHeader(USER_ID_HEADER) long userId,
                                          @RequestBody CreateBookingDto dto) {
 
         return bookingClient.bookItem(userId, dto);
     }
 
     @PatchMapping("/{bookingId}")
-    public ResponseEntity<Object> approve(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> approve(@RequestHeader(USER_ID_HEADER) long userId,
                                           @PathVariable Long bookingId,
                                           @RequestParam Boolean approved) {
 
@@ -31,14 +32,14 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public ResponseEntity<Object> getById(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> getById(@RequestHeader(USER_ID_HEADER) long userId,
                                           @PathVariable Long bookingId) {
 
         return bookingClient.getBooking(userId, bookingId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllByUserId(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ResponseEntity<Object> getAllByUserId(@RequestHeader(USER_ID_HEADER) long userId,
                                                  @RequestParam(required = false) BookingState state) {
 
         if (state == null) {
@@ -49,7 +50,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") long ownerId,
+    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader(USER_ID_HEADER) long ownerId,
                                                   @RequestParam(required = false) BookingState state) {
 
         if (state == null) {

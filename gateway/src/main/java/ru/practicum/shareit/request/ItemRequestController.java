@@ -11,16 +11,17 @@ import ru.practicum.shareit.request.dto.CreateItemRequestDto;
 public class ItemRequestController {
 
     private final ItemRequestClient itemRequestClient;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> create(@RequestHeader(USER_ID_HEADER) Long userId,
                                          @RequestBody CreateItemRequestDto dto) {
 
         return itemRequestClient.createRequest(userId, dto);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getRequestsByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public ResponseEntity<Object> getRequestsByOwner(@RequestHeader(USER_ID_HEADER) Long ownerId) {
 
         return itemRequestClient.getAllByOwnerId(ownerId);
     }
@@ -38,7 +39,7 @@ public class ItemRequestController {
     @PatchMapping("/{requestId}/add/{itemId}")
     public ResponseEntity<Object> addItemToRequest(@PathVariable Long requestId,
                                                    @PathVariable Long itemId,
-                                                   @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                                   @RequestHeader(USER_ID_HEADER) Long userId) {
 
         return itemRequestClient.addItem(userId, requestId, itemId);
     }

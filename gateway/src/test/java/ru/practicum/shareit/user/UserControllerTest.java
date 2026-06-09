@@ -54,7 +54,7 @@ class UserControllerTest {
         mockMvc.perform(get("/users/{userId}", userId))
                 .andExpect(status().isOk());
 
-        verify(userClient, times(1)).getUser(eq(userId));
+        verify(userClient).getUser(eq(userId));
     }
 
     @Test
@@ -68,7 +68,7 @@ class UserControllerTest {
                 )
                 .andExpect(status().isCreated());
 
-        verify(userClient, times(1)).createUser(any(CreateUserDto.class));
+        verify(userClient).createUser(any(CreateUserDto.class));
     }
 
     @Test
@@ -82,7 +82,7 @@ class UserControllerTest {
                 )
                 .andExpect(status().isOk());
 
-        verify(userClient, times(1)).updateUser(eq(userId), any(UpdateUserDto.class));
+        verify(userClient).updateUser(eq(userId), any(UpdateUserDto.class));
     }
 
     @Test
@@ -93,6 +93,6 @@ class UserControllerTest {
         mockMvc.perform(delete("/users/{userId}", userId))
                 .andExpect(status().isNoContent());
 
-        verify(userClient, times(1)).deleteUser(userId);
+        verify(userClient).deleteUser(userId);
     }
 }

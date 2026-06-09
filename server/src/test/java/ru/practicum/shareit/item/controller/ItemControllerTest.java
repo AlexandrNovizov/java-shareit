@@ -94,7 +94,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value(newItem.getName()))
                 .andExpect(jsonPath("$.description").value(newItem.getDescription()));
 
-        verify(itemService, times(1)).getById(itemId, userId);
+        verify(itemService).getById(itemId, userId);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.name").value(newItem.getName()))
                 .andExpect(jsonPath("$.description").value(newItem.getDescription()));
 
-        verify(itemService, times(1)).create(newItem, ownerId);
+        verify(itemService).create(newItem, ownerId);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.description").value(updatedItem.getDescription()))
                 .andExpect(jsonPath("$.available").value(updatedItem.getAvailable()));
 
-        verify(itemService, times(1)).update(updatedItem, itemId, ownerId);
+        verify(itemService).update(updatedItem, itemId, ownerId);
     }
 
     @Test
@@ -152,7 +152,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$[0].id").value(itemId))
                 .andExpect(jsonPath("$[0].name").value(item.getName()));
 
-        verify(itemService, times(1)).getAllByOwnerId(ownerId);
+        verify(itemService).getAllByOwnerId(ownerId);
     }
 
     @Test
@@ -167,7 +167,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$[0].id").value(itemId))
                 .andExpect(jsonPath("$[0].name").value(item.getName()));
 
-        verify(itemService, times(1)).search(testQuery);
+        verify(itemService).search(testQuery);
     }
 
     @Test
@@ -182,6 +182,6 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$.id").value(comment.getId()))
                 .andExpect(jsonPath("$.text").value(comment.getText()));
 
-        verify(itemService, times(1)).addComment(newComment, itemId, ownerId);
+        verify(itemService).addComment(newComment, itemId, ownerId);
     }
 }

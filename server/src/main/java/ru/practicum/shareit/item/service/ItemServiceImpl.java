@@ -7,7 +7,6 @@ import ru.practicum.shareit.booking.model.projection.LastAndNextBooking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.ConditionsNotMetException;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.dto.mapper.CommentDtoMapper;
 import ru.practicum.shareit.item.dto.mapper.ItemDtoMapper;
@@ -24,6 +23,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.common.EntityUtils.findOrThrow;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -37,14 +38,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(CreateItemDto newItem, Long ownerId) {
-        User owner = getUserOrThrowException(ownerId);
+        User owner = findOrThrow(userRepository, ownerId);
 
         ItemRequest request = null;
         if (newItem.getRequestId() != null) {
             Long requestId = newItem.getRequestId();
-            request = itemRequestRepository.findById(requestId).orElseThrow(
-                    () -> new NotFoundException(String.format("Запрос с id=%d не найден", requestId))
-            );
+            request = findOrThrow(itemRequestRepository, requestId);
         }
 
         Item createdItem = itemRepository.save(ItemDtoMapper.mapToItem(newItem, owner));
@@ -61,9 +60,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto update(UpdateItemDto updateItemDto, Long itemId, Long ownerId) {
-        getUserOrThrowException(ownerId);
+        findOrThrow(userRepository, ownerId);
 
-        Item oldItem = getItemOrThrowException(itemId);
+        Item oldItem = findOrThrow(itemRepository, itemId);
         if (!oldItem.getOwner().getId().equals(ownerId)) {
             throw new AccessDeniedException(
                     String.format(
@@ -80,9 +79,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getById(Long itemId, Long userId) {
-        Item item = getItemOrThrowException(itemId);
+        Item item = findOrThrow(itemRepository, itemId);
 
-        getUserOrThrowException(userId);
+        findOrThrow(userRepository, userId);
 
         ItemDto dto = ItemDtoMapper.mapToDto(item);
 
@@ -107,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAllByOwnerId(Long ownerId) {
-        getUserOrThrowException(ownerId);
+        findOrThrow(userRepository, ownerId);
 
         List<ItemDto> items = itemRepository.findByOwnerId(ownerId).stream()
                 .map(ItemDtoMapper::mapToDto)
@@ -157,9 +156,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto addComment(CreateCommentDto newComment, Long itemId, Long userId) {
-        User user = getUserOrThrowException(userId);
+        User user = findOrThrow(userRepository, userId);
 
-        Item item = getItemOrThrowException(itemId);
+        Item item = findOrThrow(itemRepository, itemId);
 
         if (!bookingRepository.hasItemBookedByUser(itemId, userId)) {
             throw new ConditionsNotMetException(
@@ -171,18 +170,6 @@ public class ItemServiceImpl implements ItemService {
                 CommentDtoMapper.mapToComment(newComment, user, item)
         );
         return CommentDtoMapper.mapToCommentDto(createdComment);
-    }
-
-    private Item getItemOrThrowException(Long itemId) {
-        return itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException(String.format("Предмет с id=%d не найден", itemId))
-        );
-    }
-
-    private User getUserOrThrowException(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
     }
 
     private void setFields(Item oldItem, UpdateItemDto updateItem) {

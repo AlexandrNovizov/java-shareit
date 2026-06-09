@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.shareit.common.DisplayName;
 
 @Data
 @EqualsAndHashCode(of = "id")
@@ -9,6 +10,7 @@ import lombok.*;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
+@DisplayName("Пользователь")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

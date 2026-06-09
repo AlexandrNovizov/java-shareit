@@ -109,14 +109,14 @@ class BookingServiceImplTest {
         assertThat(result.getItem().getId(), equalTo(itemId));
         assertThat(result.getBooker().getId(), equalTo(bookerId));
 
-        verify(userRepository, times(1)).findById(bookerId);
-        verify(itemRepository, times(1)).findById(itemId);
-        verify(bookingRepository, times(1)).save(ArgumentMatchers.any(Booking.class));
+        verify(userRepository).findById(bookerId);
+        verify(itemRepository).findById(itemId);
+        verify(bookingRepository).save(ArgumentMatchers.any(Booking.class));
     }
 
     @Test
     void create_WhenUserNotFound_ShouldThrowNotFoundException() {
-        String expectedMessage = String.format("Пользователь с id=%d не найден", bookerId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", bookerId);
         when(userRepository.findById(bookerId)).thenReturn(Optional.empty());
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
 
@@ -124,13 +124,13 @@ class BookingServiceImplTest {
                 () -> bookingService.create(newBooking, bookerId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(userRepository, times(1)).findById(bookerId);
+        verify(userRepository).findById(bookerId);
         verify(bookingRepository, never()).save(any());
     }
 
     @Test
     void create_WhenItemNotFound_ShouldThrowNotFoundException() {
-        String expectedMessage = String.format("Предмет с id=%d не найден", itemId);
+        String expectedMessage = String.format("Предмет с id=%d не найден(-о)", itemId);
         when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
         when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
@@ -138,7 +138,7 @@ class BookingServiceImplTest {
                 () -> bookingService.create(newBooking, bookerId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository).findById(itemId);
         verify(bookingRepository, never()).save(any());
     }
 
@@ -153,7 +153,7 @@ class BookingServiceImplTest {
                 () -> bookingService.create(newBooking, bookerId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(itemRepository, times(1)).findById(itemId);
+        verify(itemRepository).findById(itemId);
         verify(bookingRepository, never()).save(any());
     }
 
@@ -173,8 +173,8 @@ class BookingServiceImplTest {
                 () -> bookingService.create(invalidBooking, bookerId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(userRepository, times(1)).findById(bookerId);
-        verify(itemRepository, times(1)).findById(itemId);
+        verify(userRepository).findById(bookerId);
+        verify(itemRepository).findById(itemId);
         verify(bookingRepository, never()).save(any());
     }
 
@@ -195,8 +195,8 @@ class BookingServiceImplTest {
                 () -> bookingService.create(invalidBooking, bookerId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(userRepository, times(1)).findById(bookerId);
-        verify(itemRepository, times(1)).findById(itemId);
+        verify(userRepository).findById(bookerId);
+        verify(itemRepository).findById(itemId);
         verify(bookingRepository, never()).save(any());
     }
 
@@ -221,8 +221,8 @@ class BookingServiceImplTest {
 
         assertThat(result.getId(), equalTo(bookingId));
         assertThat(result.getStatus(), equalTo(expectedBooking.getStatus()));
-        verify(bookingRepository, times(1)).findById(bookingId);
-        verify(bookingRepository, times(1)).save(expectedBooking);
+        verify(bookingRepository).findById(bookingId);
+        verify(bookingRepository).save(expectedBooking);
     }
 
     @Test
@@ -246,14 +246,14 @@ class BookingServiceImplTest {
 
         assertThat(result.getId(), equalTo(bookingId));
         assertThat(result.getStatus(), equalTo(expectedBooking.getStatus()));
-        verify(bookingRepository, times(1)).findById(bookingId);
-        verify(bookingRepository, times(1)).save(expectedBooking);
+        verify(bookingRepository).findById(bookingId);
+        verify(bookingRepository).save(expectedBooking);
     }
 
     @Test
     void approve_WhenBookingNotFound_ShouldThrowNotFoundException() {
         Boolean isApproved = true;
-        String expectedMessage = String.format("Бронирование с id=%d не найдено", bookingId);
+        String expectedMessage = String.format("Бронирование с id=%d не найден(-о)", bookingId);
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
@@ -261,7 +261,7 @@ class BookingServiceImplTest {
                 bookingService.approve(bookingId, isApproved, ownerId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(bookingRepository, times(1)).findById(bookingId);
+        verify(bookingRepository).findById(bookingId);
         verify(bookingRepository, never()).save(any());
     }
 
@@ -279,7 +279,7 @@ class BookingServiceImplTest {
                 bookingService.approve(bookingId, isApproved, notOwnerId)
         );
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(bookingRepository, times(1)).findById(bookingId);
+        verify(bookingRepository).findById(bookingId);
         verify(bookingRepository, never()).save(any());
     }
 
@@ -292,8 +292,8 @@ class BookingServiceImplTest {
 
         assertThat(result, notNullValue());
         assertThat(result.getId(), equalTo(bookingId));
-        verify(bookingRepository, times(1)).findById(bookingId);
-        verify(userRepository, times(1)).findById(bookerId);
+        verify(bookingRepository).findById(bookingId);
+        verify(userRepository).findById(bookerId);
     }
 
     @Test
@@ -305,13 +305,13 @@ class BookingServiceImplTest {
 
         assertThat(result, notNullValue());
         assertThat(result.getId(), equalTo(bookingId));
-        verify(bookingRepository, times(1)).findById(bookingId);
-        verify(userRepository, times(1)).findById(ownerId);
+        verify(bookingRepository).findById(bookingId);
+        verify(userRepository).findById(ownerId);
     }
 
     @Test
     void getById_WhenBookingDoesNotExist_ShouldThrowNotFoundException() {
-        String expectedMessage = String.format("Бронирование с id=%d не найдено", bookingId);
+        String expectedMessage = String.format("Бронирование с id=%d не найден(-о)", bookingId);
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
         when(userRepository.findById(bookerId)).thenReturn(Optional.of(booker));
 
@@ -319,13 +319,13 @@ class BookingServiceImplTest {
                 () -> bookingService.getById(bookingId, bookerId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(bookingRepository, times(1)).findById(bookingId);
+        verify(bookingRepository).findById(bookingId);
     }
 
     @Test
     void getById_WhenUserDoesNotExist_ShouldThrowNotFoundException() {
         long unExistingId = 999L;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistingId);
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(userRepository.findById(unExistingId)).thenReturn(Optional.empty());
 
@@ -333,7 +333,7 @@ class BookingServiceImplTest {
                 () -> bookingService.getById(bookingId, unExistingId));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(userRepository, times(1)).findById(unExistingId);
+        verify(userRepository).findById(unExistingId);
     }
 
     @Test
@@ -353,14 +353,14 @@ class BookingServiceImplTest {
                 () -> bookingService.getById(bookingId, otherUser.getId()));
 
         assertThat(exception.getMessage(), equalTo(expectedMessage));
-        verify(bookingRepository, times(1)).findById(bookingId);
+        verify(bookingRepository).findById(bookingId);
     }
 
     @Test
     void getAllBookingsByUserId_WhenUserNotFound_ShouldThrowNotFoundException() {
         Long unExistingId = 999L;
         BookingState state = BookingState.ALL;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistingId);
 
         when(userRepository.findById(unExistingId))
                 .thenReturn(Optional.empty());
@@ -386,7 +386,7 @@ class BookingServiceImplTest {
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(bookingId));
         assertThat(result.get(0).getItem().getId(), equalTo(itemId));
-        verify(bookingRepository, times(1)).getAllBookingsByBookerId(bookerId);
+        verify(bookingRepository).getAllBookingsByBookerId(bookerId);
     }
 
     @Test
@@ -413,7 +413,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(2L));
-        verify(bookingRepository, times(1)).getCurrentBookingsByBookerId(bookerId);
+        verify(bookingRepository).getCurrentBookingsByBookerId(bookerId);
     }
 
     @Test
@@ -439,7 +439,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(3L));
-        verify(bookingRepository, times(1)).getPastBookingsByBookerId(bookerId);
+        verify(bookingRepository).getPastBookingsByBookerId(bookerId);
     }
 
     @Test
@@ -465,7 +465,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(4L));
-        verify(bookingRepository, times(1)).getFutureBookingsByBookerId(bookerId);
+        verify(bookingRepository).getFutureBookingsByBookerId(bookerId);
     }
 
     @Test
@@ -491,7 +491,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(4L));
-        verify(bookingRepository, times(1)).getWaitingBookingsByBookerId(bookerId);
+        verify(bookingRepository).getWaitingBookingsByBookerId(bookerId);
     }
 
     @Test
@@ -517,7 +517,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(4L));
-        verify(bookingRepository, times(1)).getRejectedBookingsByBookerId(bookerId);
+        verify(bookingRepository).getRejectedBookingsByBookerId(bookerId);
     }
 
     @Test
@@ -532,7 +532,7 @@ class BookingServiceImplTest {
         List<BookingDto> result = bookingService.getAllBookingsByUserId(bookerId, state);
 
         assertThat(result, is(empty()));
-        verify(bookingRepository, times(1)).getAllBookingsByBookerId(bookerId);
+        verify(bookingRepository).getAllBookingsByBookerId(bookerId);
     }
 
     @Test
@@ -556,7 +556,7 @@ class BookingServiceImplTest {
     void getAllBookingsByOwnerId_WhenUserNotFound_ShouldThrowNotFoundException() {
         Long unExistingId = 999L;
         BookingState state = BookingState.ALL;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistingId);
 
         when(userRepository.findById(unExistingId))
                 .thenReturn(Optional.empty());
@@ -582,7 +582,7 @@ class BookingServiceImplTest {
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(bookingId));
         assertThat(result.get(0).getItem().getId(), equalTo(itemId));
-        verify(bookingRepository, times(1)).getAllBookingsByOwnerId(ownerId);
+        verify(bookingRepository).getAllBookingsByOwnerId(ownerId);
     }
 
     @Test
@@ -609,7 +609,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(2L));
-        verify(bookingRepository, times(1)).getCurrentBookingsByOwnerId(ownerId);
+        verify(bookingRepository).getCurrentBookingsByOwnerId(ownerId);
     }
 
     @Test
@@ -635,7 +635,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(3L));
-        verify(bookingRepository, times(1)).getPastBookingsByOwnerId(ownerId);
+        verify(bookingRepository).getPastBookingsByOwnerId(ownerId);
     }
 
     @Test
@@ -661,7 +661,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(4L));
-        verify(bookingRepository, times(1)).getFutureBookingsByOwnerId(ownerId);
+        verify(bookingRepository).getFutureBookingsByOwnerId(ownerId);
     }
 
     @Test
@@ -687,7 +687,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(4L));
-        verify(bookingRepository, times(1)).getWaitingBookingsByOwnerId(ownerId);
+        verify(bookingRepository).getWaitingBookingsByOwnerId(ownerId);
     }
 
     @Test
@@ -713,7 +713,7 @@ class BookingServiceImplTest {
 
         assertThat(result, hasSize(1));
         assertThat(result.get(0).getId(), equalTo(4L));
-        verify(bookingRepository, times(1)).getRejectedBookingsByOwnerId(ownerId);
+        verify(bookingRepository).getRejectedBookingsByOwnerId(ownerId);
     }
 
     @Test
@@ -728,7 +728,7 @@ class BookingServiceImplTest {
         List<BookingDto> result = bookingService.getAllBookingsByOwnerId(ownerId, state);
 
         assertThat(result, is(empty()));
-        verify(bookingRepository, times(1)).getAllBookingsByOwnerId(ownerId);
+        verify(bookingRepository).getAllBookingsByOwnerId(ownerId);
     }
 
     @Test

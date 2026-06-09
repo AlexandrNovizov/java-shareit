@@ -15,11 +15,12 @@ import java.util.List;
 public class ItemController {
 
     private final ItemService itemService;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @GetMapping("/{itemId}")
     public ItemDto getById(
             @PathVariable Long itemId,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(USER_ID_HEADER) Long userId) {
 
         return itemService.getById(itemId, userId);
     }
@@ -28,7 +29,7 @@ public class ItemController {
     @ResponseStatus(HttpStatus.CREATED)
     public ItemDto create(
             @RequestBody @Validated CreateItemDto newItem,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId
+            @RequestHeader(USER_ID_HEADER) Long ownerId
     ) {
 
         return itemService.create(newItem, ownerId);
@@ -38,14 +39,14 @@ public class ItemController {
     public ItemDto update(
             @PathVariable Long itemId,
             @RequestBody UpdateItemDto updateItem,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId
+            @RequestHeader(USER_ID_HEADER) Long ownerId
     ) {
 
         return itemService.update(updateItem, itemId, ownerId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public List<ItemDto> getAllByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId) {
         return itemService.getAllByOwnerId(ownerId);
     }
 
@@ -59,7 +60,7 @@ public class ItemController {
     public CommentDto addComment(
             @PathVariable Long itemId,
             @RequestBody @Validated CreateCommentDto createDto,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+            @RequestHeader(USER_ID_HEADER) Long ownerId) {
 
         return itemService.addComment(createDto, itemId, ownerId);
     }

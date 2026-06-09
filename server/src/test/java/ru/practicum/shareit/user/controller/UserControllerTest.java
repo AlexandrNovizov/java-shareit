@@ -67,7 +67,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name").value(user.getName()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()));
 
-        verify(userService, times(1)).getById(userId);
+        verify(userService).getById(userId);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name").value(newUser.getName()))
                 .andExpect(jsonPath("$.email").value(newUser.getEmail()));
 
-        verify(userService, times(1)).create(any(CreateUserDto.class));
+        verify(userService).create(any(CreateUserDto.class));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name").value(updatedUser.getName()))
                 .andExpect(jsonPath("$.email").value(updatedUser.getEmail()));
 
-        verify(userService, times(1)).update(any(UpdateUserDto.class), eq(userId));
+        verify(userService).update(any(UpdateUserDto.class), eq(userId));
     }
 
     @Test
@@ -116,6 +116,6 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(userService, times(1)).delete(otherUserId);
+        verify(userService).delete(otherUserId);
     }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.common.EntityUtils;
 import ru.practicum.shareit.exception.EmailAlreadyExistsException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.CreateUserDto;
@@ -28,6 +29,9 @@ class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private EntityUtils entityUtils;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -49,8 +53,8 @@ class UserServiceImplTest {
 
         UserDto result = userService.create(createUserDto);
 
-        verify(userRepository, times(1)).existsByEmail(user.getEmail());
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository).existsByEmail(user.getEmail());
+        verify(userRepository).save(any(User.class));
 
         assertThat(result, notNullValue());
         assertThat(result.getId(), equalTo(1L));
@@ -80,9 +84,9 @@ class UserServiceImplTest {
 
         UserDto result = userService.update(updateUserDto, userId);
 
-        verify(userRepository, times(1)).findById(userId);
-        verify(userRepository, times(1)).existsByEmail(updateUserDto.getEmail());
-        verify(userRepository, times(1)).save(user);
+        verify(userRepository).findById(userId);
+        verify(userRepository).existsByEmail(updateUserDto.getEmail());
+        verify(userRepository).save(user);
 
         assertThat(result, notNullValue());
         assertThat(result.getId(), equalTo(userId));
@@ -93,7 +97,7 @@ class UserServiceImplTest {
     @Test
     void update_ShouldThrowNotFoundException_WhenUserDoesNotExist() {
         Long unExistentId = 999L;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistentId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistentId);
         when(userRepository.findById(unExistentId)).thenReturn(java.util.Optional.empty());
 
         Throwable exception = assertThrows(NotFoundException.class,
@@ -112,7 +116,7 @@ class UserServiceImplTest {
 
         userService.delete(userId);
 
-        verify(userRepository, times(1)).deleteById(userId);
+        verify(userRepository).deleteById(userId);
     }
 
     @Test
@@ -122,7 +126,7 @@ class UserServiceImplTest {
 
         UserDto result = userService.getById(userId);
 
-        verify(userRepository, times(1)).findById(userId);
+        verify(userRepository).findById(userId);
 
         assertThat(result, notNullValue());
         assertThat(result.getId(), equalTo(userId));
@@ -133,11 +137,11 @@ class UserServiceImplTest {
     @Test
     void getById_ShouldThrowNotFoundException_WhenUserDoesNotExist() {
         Long unExistentId = 999L;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistentId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistentId);
         when(userRepository.findById(unExistentId)).thenReturn(java.util.Optional.empty());
 
         Throwable exception = assertThrows(NotFoundException.class, () -> userService.getById(unExistentId));
-        verify(userRepository, times(1)).findById(unExistentId);
+        verify(userRepository).findById(unExistentId);
         assertThat(exception.getMessage(), equalTo(expectedMessage));
     }
 }

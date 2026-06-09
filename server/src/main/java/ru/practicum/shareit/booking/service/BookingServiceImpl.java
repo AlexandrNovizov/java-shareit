@@ -18,6 +18,8 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
+import static ru.practicum.shareit.common.EntityUtils.findOrThrow;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,13 +32,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto create(CreateBookingDto dto, Long userId) {
 
-        User booker = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
+        User booker = findOrThrow(userRepository, userId);
 
-        Item item = itemRepository.findById(dto.getItemId()).orElseThrow(
-                () -> new NotFoundException(String.format("Предмет с id=%d не найден", dto.getItemId()))
-        );
+        Item item = findOrThrow(itemRepository, dto.getItemId());
 
         if (!item.getAvailable()) {
             throw new UnavailableItemException(String.format("Предмет с id=%d недоступен", item.getId()));
@@ -54,9 +52,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto approve(Long bookingId, Boolean isApproved, Long userId) {
 
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
-                () -> new NotFoundException(String.format("Бронирование с id=%d не найдено", bookingId))
-        );
+        Booking booking = findOrThrow(bookingRepository, bookingId);
 
         if (!booking.getItem().getOwner().getId().equals(userId)) {
             throw new AccessDeniedException(String.format(
@@ -77,13 +73,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getById(Long bookingId, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
-                () -> new NotFoundException(String.format("Бронирование с id=%d не найдено", bookingId))
-        );
+        Booking booking = findOrThrow(bookingRepository, bookingId);
 
-        userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
+        findOrThrow(userRepository, userId);
 
         if (!userId.equals(booking.getBooker().getId()) &&
                 !userId.equals(booking.getItem().getOwner().getId())) {
@@ -99,9 +91,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllBookingsByUserId(Long userId, BookingState state) {
 
-        userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
+        findOrThrow(userRepository, userId);
 
         List<Booking> bookings = getAllBookingsByUserIdAndState(userId, state);
 
@@ -112,9 +102,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllBookingsByOwnerId(Long ownerId, BookingState state) {
-        userRepository.findById(ownerId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", ownerId))
-        );
+        findOrThrow(userRepository, ownerId);
 
         List<Booking> bookings = getAllBookingsByOwnerIdAndState(ownerId, state);
 

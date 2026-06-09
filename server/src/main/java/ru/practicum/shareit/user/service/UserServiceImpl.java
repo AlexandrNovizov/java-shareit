@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EmailAlreadyExistsException;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.dto.CreateUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
+
+import static ru.practicum.shareit.common.EntityUtils.findOrThrow;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(UpdateUserDto updateDto, Long userId) {
 
-        User userToUpdate = getUserOrThrowException(userId);
+        User userToUpdate = findOrThrow(userRepository, userId);
         throwExceptionIfNotUniqueEmail(updateDto.getEmail());
         setFields(userToUpdate, updateDto);
 
@@ -49,7 +50,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getById(Long id) {
 
-        User user = getUserOrThrowException(id);
+        User user = findOrThrow(userRepository, id);
 
         return UserDtoMapper.mapToUserDto(user);
     }
@@ -61,12 +62,6 @@ public class UserServiceImpl implements UserService {
         if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) {
             oldUser.setEmail(newUser.getEmail());
         }
-    }
-
-    private User getUserOrThrowException(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
     }
 
     private void throwExceptionIfNotUniqueEmail(String email) {

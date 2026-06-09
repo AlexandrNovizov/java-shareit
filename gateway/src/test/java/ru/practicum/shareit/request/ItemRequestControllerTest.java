@@ -53,7 +53,7 @@ class ItemRequestControllerTest {
                         .content(objectMapper.writeValueAsString(newRequest)))
                 .andExpect(status().isCreated());
 
-        verify(itemRequestClient, times(1)).createRequest(eq(userId), any(CreateItemRequestDto.class));
+        verify(itemRequestClient).createRequest(eq(userId), any(CreateItemRequestDto.class));
     }
 
     @Test
@@ -65,7 +65,7 @@ class ItemRequestControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
-        verify(itemRequestClient, times(1)).getAllByOwnerId(eq(userId));
+        verify(itemRequestClient).getAllByOwnerId(eq(userId));
     }
 
     @Test
@@ -76,7 +76,7 @@ class ItemRequestControllerTest {
         mockMvc.perform(get("/requests/all"))
                 .andExpect(status().isOk());
 
-        verify(itemRequestClient, times(1)).getAll();
+        verify(itemRequestClient).getAll();
     }
 
     @Test
@@ -87,7 +87,7 @@ class ItemRequestControllerTest {
         mockMvc.perform(get("/requests/{requestId}", requestId))
                 .andExpect(status().isOk());
 
-        verify(itemRequestClient, times(1)).getRequest(eq(requestId));
+        verify(itemRequestClient).getRequest(eq(requestId));
     }
 
     @Test
@@ -99,7 +99,7 @@ class ItemRequestControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
-        verify(itemRequestClient, times(1)).addItem(eq(userId), eq(requestId), eq(itemId));
+        verify(itemRequestClient).addItem(eq(userId), eq(requestId), eq(itemId));
     }
 }
 

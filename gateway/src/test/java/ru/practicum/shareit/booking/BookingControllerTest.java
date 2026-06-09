@@ -56,7 +56,7 @@ class BookingControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
 
-        verify(bookingClient, times(1)).bookItem(eq(userId), any(CreateBookingDto.class));
+        verify(bookingClient).bookItem(eq(userId), any(CreateBookingDto.class));
     }
 
     @Test
@@ -69,7 +69,7 @@ class BookingControllerTest {
                         .param("approved", "true"))
                 .andExpect(status().isOk());
 
-        verify(bookingClient, times(1)).approveBooking(eq(userId), eq(bookingId), eq(true));
+        verify(bookingClient).approveBooking(eq(userId), eq(bookingId), eq(true));
     }
 
     @Test
@@ -81,7 +81,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
-        verify(bookingClient, times(1)).getBooking(eq(userId), eq(bookingId));
+        verify(bookingClient).getBooking(eq(userId), eq(bookingId));
     }
 
     @Test
@@ -93,7 +93,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
-        verify(bookingClient, times(1)).getAllBookingsByUserId(eq(userId), eq(BookingState.ALL));
+        verify(bookingClient).getAllBookingsByUserId(eq(userId), eq(BookingState.ALL));
     }
 
     @Test
@@ -107,7 +107,7 @@ class BookingControllerTest {
                         .param("state", testState.name()))
                 .andExpect(status().isOk());
 
-        verify(bookingClient, times(1)).getAllBookingsByUserId(eq(userId), eq(testState));
+        verify(bookingClient).getAllBookingsByUserId(eq(userId), eq(testState));
     }
 
     @Test
@@ -119,7 +119,7 @@ class BookingControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
-        verify(bookingClient, times(1)).getAllBookingsByOwnerId(eq(userId), eq(BookingState.ALL));
+        verify(bookingClient).getAllBookingsByOwnerId(eq(userId), eq(BookingState.ALL));
     }
 
     @Test
@@ -133,6 +133,6 @@ class BookingControllerTest {
                         .param("state", testState.name()))
                 .andExpect(status().isOk());
 
-        verify(bookingClient, times(1)).getAllBookingsByOwnerId(eq(userId), eq(testState));
+        verify(bookingClient).getAllBookingsByOwnerId(eq(userId), eq(testState));
     }
 }

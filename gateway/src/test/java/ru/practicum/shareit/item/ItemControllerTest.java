@@ -64,7 +64,7 @@ class ItemControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
-        verify(itemClient, times(1)).getItem(userId, itemId);
+        verify(itemClient).getItem(userId, itemId);
     }
 
     @Test
@@ -77,7 +77,7 @@ class ItemControllerTest {
                         .content(objectMapper.writeValueAsString(createItemDto)))
                 .andExpect(status().isCreated());
 
-        verify(itemClient, times(1)).createItem(userId, createItemDto);
+        verify(itemClient).createItem(userId, createItemDto);
     }
 
     @Test
@@ -90,7 +90,7 @@ class ItemControllerTest {
                         .content(objectMapper.writeValueAsString(updateItemDto)))
                 .andExpect(status().isOk());
 
-        verify(itemClient, times(1)).updateItem(userId, itemId, updateItemDto);
+        verify(itemClient).updateItem(userId, itemId, updateItemDto);
     }
 
     @Test
@@ -101,7 +101,7 @@ class ItemControllerTest {
                         .header("X-Sharer-User-Id", userId))
                 .andExpect(status().isOk());
 
-        verify(itemClient, times(1)).getAllByOwnerId(userId);
+        verify(itemClient).getAllByOwnerId(userId);
     }
 
     @Test
@@ -113,7 +113,7 @@ class ItemControllerTest {
                         .param("text", testQuery))
                 .andExpect(status().isOk());
 
-        verify(itemClient, times(1)).search(testQuery);
+        verify(itemClient).search(testQuery);
     }
 
     @Test
@@ -126,6 +126,6 @@ class ItemControllerTest {
                         .content(objectMapper.writeValueAsString(createCommentDto)))
                 .andExpect(status().isCreated());
 
-        verify(itemClient, times(1)).addComment(userId, itemId, createCommentDto);
+        verify(itemClient).addComment(userId, itemId, createCommentDto);
     }
 }

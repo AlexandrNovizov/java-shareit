@@ -52,7 +52,7 @@ class ItemRequestServiceImplTest {
     @Test
     void userCreateShouldThrowExceptionIfUserNotFound() {
         String expectedDesc = "test desc";
-        String expectedMessage = String.format("Пользователь с id=%d не найден", testUser.getId());
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", testUser.getId());
         CreateItemRequestDto testDto = new CreateItemRequestDto(expectedDesc);
         ItemRequest expectedRequest = new ItemRequest(
                 1L,
@@ -142,7 +142,7 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getRequestsForUserShouldThrowExceptionIfUserNotFound() {
-        String expectedMessage = String.format("Пользователь с id=%d не найден", testUser.getId());
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", testUser.getId());
 
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
@@ -202,7 +202,7 @@ class ItemRequestServiceImplTest {
 
         long requestId = 1L;
 
-        String expectedMessage = String.format("Запрос с id=%d не найден", requestId);
+        String expectedMessage = String.format("Запрос с id=%d не найден(-о)", requestId);
 
         when(itemRequestRepository.findById(1L))
                 .thenReturn(Optional.empty());
@@ -307,7 +307,7 @@ class ItemRequestServiceImplTest {
         long requestId = 1L;
         long itemId = 1L;
 
-        String expectedMessage = String.format("Запрос с id=%d не найден", requestId);
+        String expectedMessage = String.format("Запрос с id=%d не найден(-о)", requestId);
 
         when(itemRequestRepository.findById(1L))
                 .thenReturn(Optional.empty());
@@ -329,7 +329,7 @@ class ItemRequestServiceImplTest {
         long requestId = 1L;
         long itemId = 1L;
 
-        String expectedMessage = String.format("Предмет с id=%d не найден", requestId);
+        String expectedMessage = String.format("Предмет с id=%d не найден(-о)", requestId);
 
         when(itemRequestRepository.findById(1L))
                 .thenReturn(Optional.of(new ItemRequest()));
@@ -351,7 +351,7 @@ class ItemRequestServiceImplTest {
         long requestId = 1L;
         long itemId = 1L;
 
-        String expectedMessage = String.format("Пользователь с id=%d не найден", testUser.getId());
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", testUser.getId());
 
         when(itemRequestRepository.findById(1L))
                 .thenReturn(Optional.of(new ItemRequest()));

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.common.DisplayName;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -15,6 +16,7 @@ import java.util.*;
 @Table(name = "requests")
 @AllArgsConstructor
 @NoArgsConstructor
+@DisplayName("Запрос")
 public class ItemRequest {
 
     @Id

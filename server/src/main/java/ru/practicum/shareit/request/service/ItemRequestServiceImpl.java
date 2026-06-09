@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.AccessDeniedException;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.CreateItemRequestDto;
@@ -20,6 +19,8 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.util.List;
 import java.util.Objects;
 
+import static ru.practicum.shareit.common.EntityUtils.findOrThrow;
+
 @Service
 @RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
@@ -30,9 +31,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto create(Long userId, CreateItemRequestDto dto) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
+        User user = findOrThrow(userRepository, userId);
 
         ItemRequest newRequest = ItemRequestDtoMapper.mapToEntity(dto, user);
 
@@ -43,9 +42,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestWithItemsDto> getAllByOwnerId(Long ownerId) {
-        userRepository.findById(ownerId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", ownerId))
-        );
+        findOrThrow(userRepository, ownerId);
 
         List<ItemRequest> userRequests = itemRequestRepository.findAllByUserIdOrderByCreatedDesc(ownerId);
 
@@ -67,26 +64,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestWithItemsDto getById(Long requestId) {
 
-        ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(
-                () -> new NotFoundException(String.format("Запрос с id=%d не найден", requestId))
-        );
+        ItemRequest request = findOrThrow(itemRequestRepository, requestId);
 
         return ItemRequestWithItemsDtoMapper.mapToDto(request);
     }
 
     @Override
     public ItemRequestWithItemsDto addItem(Long userId, Long requestId, Long itemId) {
-        userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId))
-        );
+        findOrThrow(userRepository, userId);
 
-        ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(
-                () -> new NotFoundException(String.format("Запрос с id=%d не найден", requestId))
-        );
+        ItemRequest request = findOrThrow(itemRequestRepository, requestId);
 
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException(String.format("Предмет с id=%d не найден", itemId))
-        );
+        Item item = findOrThrow(itemRepository, itemId);
 
         if (!Objects.equals(item.getOwner().getId(), userId)) {
             throw new AccessDeniedException(String.format(

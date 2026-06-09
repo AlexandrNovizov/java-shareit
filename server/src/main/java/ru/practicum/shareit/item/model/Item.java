@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.common.DisplayName;
 import ru.practicum.shareit.user.model.User;
 
 @Data
@@ -13,6 +14,7 @@ import ru.practicum.shareit.user.model.User;
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
+@DisplayName("Предмет")
 public class Item {
 
     @Id

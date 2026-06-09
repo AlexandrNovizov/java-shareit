@@ -76,7 +76,7 @@ public class ItemRequestServiceIntegrationTest {
     void saveShouldThrowNotFoundExceptionIfUserNotExists() {
         String expectedDesc = "test desc";
         long unExistingId = Long.MAX_VALUE;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistingId);
 
         CreateItemRequestDto createItemRequestDto = new CreateItemRequestDto(expectedDesc);
 
@@ -173,7 +173,7 @@ public class ItemRequestServiceIntegrationTest {
     @Test
     void getAllByOwnerIdShouldThrowNotFoundExceptionIfUserNotExists() {
         long unExistingId = Long.MAX_VALUE;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistingId);
 
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemRequestService.getAllByOwnerId(unExistingId));
@@ -209,7 +209,7 @@ public class ItemRequestServiceIntegrationTest {
     @Test
     void getByIdShouldThrowNotFoundExceptionIfRequestNotExists() {
         long unExistingId = Long.MAX_VALUE;
-        String expectedMessage = String.format("Запрос с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Запрос с id=%d не найден(-о)", unExistingId);
 
         Throwable exception = assertThrows(NotFoundException.class,
                 () -> itemRequestService.getById(unExistingId));
@@ -345,7 +345,7 @@ public class ItemRequestServiceIntegrationTest {
     @Test
     void addItemShouldThrowNotFoundExceptionIfRequestNotExists() {
         long unExistingId = Long.MAX_VALUE;
-        String expectedMessage = String.format("Запрос с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Запрос с id=%d не найден(-о)", unExistingId);
         user = userRepository.save(user);
         Item item = new Item(
                 null, "test item", "test item desc", true, user
@@ -362,7 +362,7 @@ public class ItemRequestServiceIntegrationTest {
     @Test
     void addItemShouldThrowNotFoundExceptionIfItemNotExists() {
         long unExistingId = Long.MAX_VALUE;
-        String expectedMessage = String.format("Предмет с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Предмет с id=%d не найден(-о)", unExistingId);
         user = userRepository.save(user);
         ItemRequest request = new ItemRequest(
                 null,
@@ -382,7 +382,7 @@ public class ItemRequestServiceIntegrationTest {
     @Test
     void addItemShouldThrowNotFoundExceptionIfUserNotExists() {
         long unExistingId = Long.MAX_VALUE;
-        String expectedMessage = String.format("Пользователь с id=%d не найден", unExistingId);
+        String expectedMessage = String.format("Пользователь с id=%d не найден(-о)", unExistingId);
         user = userRepository.save(user);
         Item item = new Item(
                 null, "test item", "test item desc", true, user

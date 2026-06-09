@@ -14,11 +14,12 @@ import ru.practicum.shareit.item.dto.UpdateItemDto;
 public class ItemController {
 
     private final ItemClient itemClient;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @GetMapping("/{itemId}")
     public ResponseEntity<Object> getById(
             @PathVariable Long itemId,
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(USER_ID_HEADER) Long userId) {
 
         return itemClient.getItem(userId, itemId);
     }
@@ -27,7 +28,7 @@ public class ItemController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> create(
             @RequestBody CreateItemDto newItem,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId
+            @RequestHeader(USER_ID_HEADER) Long ownerId
     ) {
 
         return itemClient.createItem(ownerId, newItem);
@@ -37,14 +38,14 @@ public class ItemController {
     public ResponseEntity<Object> update(
             @PathVariable Long itemId,
             @RequestBody UpdateItemDto updateItem,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId
+            @RequestHeader(USER_ID_HEADER) Long ownerId
     ) {
 
         return itemClient.updateItem(ownerId, itemId, updateItem);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public ResponseEntity<Object> getAllByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId) {
         return itemClient.getAllByOwnerId(ownerId);
     }
 
@@ -58,7 +59,7 @@ public class ItemController {
     public ResponseEntity<Object> addComment(
             @PathVariable Long itemId,
             @RequestBody CreateCommentDto createDto,
-            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+            @RequestHeader(USER_ID_HEADER) Long ownerId) {
 
         return itemClient.addComment(ownerId, itemId, createDto);
     }
